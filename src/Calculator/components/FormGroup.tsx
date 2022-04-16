@@ -8,7 +8,7 @@ interface Props {
 
 function FormGroup({ label, name, children }: React.PropsWithChildren<Props>) {
   return (
-    <div className='mb-4'>
+    <div className='mb-4 mx-4'>
       <Label label={label} name={name} />
       {children}
     </div>

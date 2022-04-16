@@ -42,16 +42,21 @@ function Calculator() {
               <Field name='vejoe' component={NumberInput} />
             </FormGroup>
           </div>
-          <div>
+          <div className='mx-4'>
             <button
               type='button'
               onClick={form.reset}
               disabled={submitting || pristine}
+              className={
+                'bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded' +
+                'focus:outline-none focus:shadow-outline'
+              }
             >
               Reset
             </button>
+            <h2 className='mt-4'>Form State:</h2>
+            <code className='block'>{JSON.stringify(values)}</code>
           </div>
-          <pre>{JSON.stringify(values)}</pre>
         </form>
       )}
     />
