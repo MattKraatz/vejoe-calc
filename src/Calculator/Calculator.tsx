@@ -1,29 +1,33 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { Form, Field } from 'react-final-form';
 import FormGroup from './components/FormGroup';
-import Label from './components/Label';
 import NumberInput from './components/NumberInput';
 import PoolPicker from './components/PoolPicker';
+import { useBoostedPools } from '../data/tjoe';
 
 const onSubmit = async (values: any) => {
   window.alert(JSON.stringify(values));
 };
-const validate = () => {
-  return {};
-};
 
 function Calculator() {
+  const [boostedPools, redoBoostedPools] = useBoostedPools();
+
+  const options = useMemo(() => {
+    return (
+      boostedPools.data?.pools.map((p) => {
+        return { label: p.pair, value: p.id };
+      }) ?? []
+    );
+  }, [boostedPools.data]);
+
   return (
     <Form
       onSubmit={onSubmit}
       initialValues={{}}
       render={({ handleSubmit, form, submitting, pristine, values }) => (
-        <form
-          onSubmit={handleSubmit}
-          className='bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4'
-        >
+        <form onSubmit={handleSubmit} className='bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4'>
           <FormGroup label='Boosted Pool' name='pool'>
-            <Field name='pool' component={PoolPicker} />
+            <Field name='pool'>{(props) => <PoolPicker {...props} options={options} />}</Field>
           </FormGroup>
           <div className='flex'>
             <div className='w-1/2'>

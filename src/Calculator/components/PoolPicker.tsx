@@ -1,7 +1,16 @@
 import React from 'react';
 import { FieldRenderProps } from 'react-final-form';
 
-function PoolPicker({ input, meta }: FieldRenderProps<any>) {
+interface Option {
+  label: string;
+  value: string;
+}
+
+interface Props extends FieldRenderProps<string> {
+  options: Array<Option>;
+}
+
+function PoolPicker({ options, input, meta }: Props) {
   return (
     <div className='relative'>
       <select
@@ -11,11 +20,13 @@ function PoolPicker({ input, meta }: FieldRenderProps<any>) {
           'focus:outline-none focus:bg-white focus:border-gray-500'
         }
       >
-        <option></option>
-        <option value='avaxusdc'>💸💸 AVAX-USDC</option>
-        <option value='avaxweth'>💸💸 AVAX-WETH.e</option>
-        <option value='avaxusdte'>💸💸 AVAX-USDT.e</option>
-        <option value='avaxusdce'>💸💸 AVAX-USDC.e</option>
+        <option key={-1}></option>
+        {options &&
+          options.map((pool) => (
+            <option key={pool.value} value={pool.value}>
+              💸💸 {pool.label}
+            </option>
+          ))}
       </select>
       <div className='pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700'>
         <svg
