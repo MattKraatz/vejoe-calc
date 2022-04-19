@@ -1,21 +1,20 @@
 import React, { useCallback } from 'react';
-import { FieldRenderProps } from 'react-final-form';
 
-function NumberInput({ input, meta }: FieldRenderProps<number>) {
-  const handleChange: React.ChangeEventHandler<HTMLInputElement> = useCallback(
-    (e) => {
-      const val = e.target.value;
-      if (e.target.value === '') {
-        input.onChange(e);
-      } else {
-        e.target.value = Number(e.target.value).toString();
-        if (Number(val) >= 0) {
-          input.onChange(e);
-        }
+interface Props {
+  value: number;
+  setValue: (val: number) => void;
+}
+
+function NumberInput({ value, setValue }: Props) {
+  const handleChange: React.ChangeEventHandler<HTMLInputElement> = useCallback((e) => {
+    if (e.target.value === '') {
+      setValue(0);
+    } else {
+      if (Number(e.target.value) >= 0) {
+        setValue(Number(e.target.value));
       }
-    },
-    []
-  );
+    }
+  }, []);
 
   return (
     <input
@@ -24,7 +23,7 @@ function NumberInput({ input, meta }: FieldRenderProps<number>) {
         'focus:outline-none focus:shadow-outline'
       }
       type='number'
-      {...input}
+      value={value}
       onChange={handleChange}
     />
   );

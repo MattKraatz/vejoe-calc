@@ -1,30 +1,31 @@
 import React from 'react';
-import { FieldRenderProps } from 'react-final-form';
 
 interface Pool {
   label: string;
   value: string;
 }
 
-interface Props extends FieldRenderProps<string> {
+interface Props {
   options: Array<Pool>;
+  value: number;
+  setValue: (val: number) => void;
 }
 
-function PoolPicker({ options, input, meta }: Props) {
+function PoolPicker({ options, value, setValue }: Props) {
   return (
     <div className='relative'>
       <select
-        {...input}
         className={
           'block appearance-none w-full bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight' +
           'focus:outline-none focus:bg-white focus:border-gray-500'
         }
+        value={value}
+        onChange={(e) => setValue(Number(e.target.value))}
       >
-        <option key={-1}></option>
         {options &&
           options.map((pool) => (
             <option key={pool.value} value={pool.value}>
-              <img src='https://cryptoicons.org/api/icon/eth/32' /> {pool.label}
+              {pool.label}
             </option>
           ))}
       </select>

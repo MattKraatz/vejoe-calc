@@ -1,5 +1,4 @@
-import React, { useMemo } from 'react';
-import { Form, Field } from 'react-final-form';
+import React, { useCallback, useMemo, useState } from 'react';
 import FormGroup from './components/FormGroup';
 import NumberInput from './components/NumberInput';
 import PoolPicker from './components/PoolPicker';
@@ -35,51 +34,54 @@ function Calculator() {
     );
   }, [boostedPools.data, poolDetails.data]);
 
+  const [poolId, setPoolId] = useState(0);
+  const [token0Amount, setToken0Amount] = useState(0);
+  const [token1Amount, setToken1Amount] = useState(0);
+  const [veJoeAmount, setVeJoeAmount] = useState(0);
+
+  const reset = useCallback(() => {
+    setPoolId(0);
+    setToken0Amount(0);
+    setToken1Amount(0);
+    setVeJoeAmount(0);
+  }, []);
+
   return (
-    <Form
-      onSubmit={onSubmit}
-      initialValues={{}}
-      render={({ handleSubmit, form, submitting, pristine, values }) => (
-        <form onSubmit={handleSubmit} className='bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4'>
-          <FormGroup label='Boosted Pool' name='pool'>
-            {/* TODO: custom select component with coin logos */}
-            <Field name='pool'>{(props) => <PoolPicker {...props} options={options} />}</Field>
+    <div className='bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4'>
+      <FormGroup label='Boosted Pool' name='pool'>
+        {/* TODO: custom select component with coin logos */}
+        <PoolPicker options={options} value={poolId} setValue={setPoolId} />
+      </FormGroup>
+      <div className='flex'>
+        <div className='w-1/2'>
+          <FormGroup label='Asset 1' name='token0'>
+            <NumberInput value={token0Amount} setValue={setToken0Amount} />
           </FormGroup>
-          <div className='flex'>
-            <div className='w-1/2'>
-              <FormGroup label='Asset 1' name='asset1'>
-                <Field name='asset1' component={NumberInput} />
-              </FormGroup>
-            </div>
-            <div className='w-1/2'>
-              <FormGroup label='Asset 2' name='asset2'>
-                <Field name='asset2' component={NumberInput} />
-              </FormGroup>
-            </div>
-          </div>
-          <div>
-            <FormGroup label='veJOE' name='vejoe'>
-              <Field name='vejoe' component={NumberInput} />
-            </FormGroup>
-          </div>
-          <div className='mx-4'>
-            <button
-              type='button'
-              onClick={form.reset}
-              disabled={submitting || pristine}
-              className={
-                'bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded' +
-                'focus:outline-none focus:shadow-outline'
-              }
-            >
-              Reset
-            </button>
-            <h2 className='mt-4'>Form State:</h2>
-            <code className='block'>{JSON.stringify(values)}</code>
-          </div>
-        </form>
-      )}
-    />
+        </div>
+        <div className='w-1/2'>
+          <FormGroup label='Asset 2' name='token1'>
+            <NumberInput value={token1Amount} setValue={setToken1Amount} />
+          </FormGroup>
+        </div>
+      </div>
+      <div>
+        <FormGroup label='veJOE' name='vejoe'>
+          <NumberInput value={veJoeAmount} setValue={setVeJoeAmount} />
+        </FormGroup>
+      </div>
+      <div className='mx-4'>
+        <button
+          type='button'
+          onClick={reset}
+          className={
+            'bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded' +
+            'focus:outline-none focus:shadow-outline'
+          }
+        >
+          Reset
+        </button>
+      </div>
+    </div>
   );
 }
 
