@@ -3,7 +3,8 @@ import { Form, Field } from 'react-final-form';
 import FormGroup from './components/FormGroup';
 import NumberInput from './components/NumberInput';
 import PoolPicker from './components/PoolPicker';
-import { useBoostedPools } from '../data/tjoe';
+import { useBoostedPools } from '../data/boosted-master-chef';
+import { useAllPairs } from '../data/exchange';
 
 const onSubmit = async (values: any) => {
   window.alert(JSON.stringify(values));
@@ -12,13 +13,27 @@ const onSubmit = async (values: any) => {
 function Calculator() {
   const [boostedPools, redoBoostedPools] = useBoostedPools();
 
-  const options = useMemo(() => {
+  const poolIds = useMemo(() => {
     return (
       boostedPools.data?.pools.map((p) => {
-        return { label: p.pair, value: p.id };
+        return p.pair;
       }) ?? []
     );
   }, [boostedPools.data]);
+
+  const [poolDetails, redoPoolDetails] = useAllPairs(poolIds);
+
+  const options = useMemo(() => {
+    return (
+      boostedPools.data?.pools.map((p) => {
+        const details = poolDetails.data?.pairs.find((pd) => pd.id === p.pair);
+        return {
+          label: details ? `${details.token0.symbol} - ${details.token1.symbol}` : p.pair,
+          value: p.id,
+        };
+      }) ?? []
+    );
+  }, [boostedPools.data, poolDetails.data]);
 
   return (
     <Form
@@ -27,6 +42,7 @@ function Calculator() {
       render={({ handleSubmit, form, submitting, pristine, values }) => (
         <form onSubmit={handleSubmit} className='bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4'>
           <FormGroup label='Boosted Pool' name='pool'>
+            {/* TODO: custom select component with coin logos */}
             <Field name='pool'>{(props) => <PoolPicker {...props} options={options} />}</Field>
           </FormGroup>
           <div className='flex'>

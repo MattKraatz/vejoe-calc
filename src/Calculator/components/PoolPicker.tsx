@@ -1,13 +1,13 @@
 import React from 'react';
 import { FieldRenderProps } from 'react-final-form';
 
-interface Option {
+interface Pool {
   label: string;
   value: string;
 }
 
 interface Props extends FieldRenderProps<string> {
-  options: Array<Option>;
+  options: Array<Pool>;
 }
 
 function PoolPicker({ options, input, meta }: Props) {
@@ -24,7 +24,7 @@ function PoolPicker({ options, input, meta }: Props) {
         {options &&
           options.map((pool) => (
             <option key={pool.value} value={pool.value}>
-              💸💸 {pool.label}
+              <img src='https://cryptoicons.org/api/icon/eth/32' /> {pool.label}
             </option>
           ))}
       </select>

@@ -3,7 +3,7 @@ import { createClient, Provider } from 'urql';
 import Calculator from './Calculator/Calculator';
 
 const client = createClient({
-  url: 'https://api.thegraph.com/subgraphs/name/traderjoe-xyz',
+  url: 'https://api.thegraph.com/subgraphs/name/traderjoe-xyz', //MUST_OVERRIDE
 });
 
 function App() {
