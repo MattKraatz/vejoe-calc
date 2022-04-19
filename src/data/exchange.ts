@@ -46,13 +46,13 @@ export function useSinglePair(id: string) {
   });
 }
 
-interface Token {
+export interface Token {
   id: string;
   symbol: string;
   derivedAVAX: number;
 }
 
-interface Pair {
+export interface Pair {
   id: string;
   name: string;
   reserve0: number;

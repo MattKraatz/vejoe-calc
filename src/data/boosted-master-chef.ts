@@ -20,7 +20,7 @@ export function useBoostedPools() {
   });
 }
 
-export interface PoolsResponse {
+interface PoolsResponse {
   pools: Array<Pools>;
 }
 

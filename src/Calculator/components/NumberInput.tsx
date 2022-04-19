@@ -6,15 +6,16 @@ interface Props {
 }
 
 function NumberInput({ value, setValue }: Props) {
-  const handleChange: React.ChangeEventHandler<HTMLInputElement> = useCallback((e) => {
-    if (e.target.value === '') {
-      setValue(0);
-    } else {
-      if (Number(e.target.value) >= 0) {
+  const handleChange: React.ChangeEventHandler<HTMLInputElement> = useCallback(
+    (e) => {
+      if (e.target.value === '') {
+        setValue(0);
+      } else if (Number(e.target.value) >= 0) {
         setValue(Number(e.target.value));
       }
-    }
-  }, []);
+    },
+    [setValue]
+  );
 
   return (
     <input
