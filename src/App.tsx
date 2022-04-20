@@ -3,6 +3,7 @@ import { createClient, Provider } from 'urql';
 import Calculator from './Calculator/Calculator';
 import FormGroup from './Calculator/components/FormGroup';
 import PoolPicker from './Calculator/components/PoolPicker';
+import { getBoostedPool } from './data/boosted-contract';
 import { useBoostedPools } from './data/boosted-master-chef';
 import { useAllPairs } from './data/exchange';
 
@@ -36,6 +37,11 @@ function App() {
   }, [boostedPools.data, poolDetails.data]);
 
   const [poolId, setPoolId] = useState(0);
+  const [veJoeShare, setVeJoeShare] = useState(0);
+
+  useEffect(() => {
+    getBoostedPool(poolId).then(console.log);
+  }, [poolId, setVeJoeShare]);
 
   const pool = useMemo(() => {
     const poolName = boostedPools.data?.pools.find((p) => p.id === poolId.toString())?.pair;

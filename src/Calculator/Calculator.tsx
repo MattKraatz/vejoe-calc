@@ -36,6 +36,10 @@ function Calculator({ pool, setPoolId }: Props) {
     [pool]
   );
 
+  const veJoeShare = useMemo(() => {
+    return;
+  }, [veJoeAmount, pool]);
+
   return (
     <>
       <div className='flex'>
