@@ -40,8 +40,8 @@ function App() {
   const [veJoeShare, setVeJoeShare] = useState(0);
 
   useEffect(() => {
-    getBoostedPool(poolId).then(console.log);
-  }, [poolId, setVeJoeShare]);
+    getBoostedPool(poolId).then((p) => console.log(`veJOE Share BP%: ${p.veJoeShareBp / 10000}`));
+  }, [poolId]);
 
   const pool = useMemo(() => {
     const poolName = boostedPools.data?.pools.find((p) => p.id === poolId.toString())?.pair;

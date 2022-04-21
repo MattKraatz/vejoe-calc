@@ -1,4 +1,5 @@
 import React, { useCallback, useMemo, useState } from 'react';
+import { useEffect } from 'react';
 import { Pair } from '../data/exchange';
 import FormGroup from './components/FormGroup';
 import NumberInput from './components/NumberInput';
@@ -35,6 +36,12 @@ function Calculator({ pool, setPoolId }: Props) {
     },
     [pool]
   );
+
+  useEffect(() => {
+    setToken0Amount(0);
+    setToken1Amount(0);
+    setVeJoeAmount(0);
+  }, [pool?.id]);
 
   const veJoeShare = useMemo(() => {
     return;
