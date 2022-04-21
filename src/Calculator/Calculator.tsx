@@ -15,11 +15,23 @@ function Calculator({ pool, setPoolId }: Props) {
   const [veJoeAmount, setVeJoeAmount] = useState(0);
 
   const reset = useCallback(() => {
-    setPoolId(0);
-    setToken0Amount(0);
-    setToken1Amount(0);
-    setVeJoeAmount(0);
+    if (pool?.id) {
+      setPoolId(0);
+    }
+    if (token0Amount) {
+      setToken0Amount(0);
+    }
+    if (token1Amount) {
+      setToken1Amount(0);
+    }
+    if (setVeJoeAmount) {
+      setVeJoeAmount(0);
+    }
   }, []);
+
+  useEffect(() => {
+    reset();
+  }, [pool?.id]);
 
   const updateToken0 = useCallback(
     (val: number) => {
@@ -36,16 +48,6 @@ function Calculator({ pool, setPoolId }: Props) {
     },
     [pool]
   );
-
-  useEffect(() => {
-    setToken0Amount(0);
-    setToken1Amount(0);
-    setVeJoeAmount(0);
-  }, [pool?.id]);
-
-  const veJoeShare = useMemo(() => {
-    return;
-  }, [veJoeAmount, pool]);
 
   return (
     <>

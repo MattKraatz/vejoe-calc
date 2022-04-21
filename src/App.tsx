@@ -8,7 +8,7 @@ import { useBoostedPools } from './data/boosted-master-chef';
 import { useAllPairs } from './data/exchange';
 
 const client = createClient({
-  url: 'https://api.thegraph.com/subgraphs/name/traderjoe-xyz', //MUST_OVERRIDE
+  url: 'https://api.thegraph.com/subgraphs/name/traderjoe-xyz', //MUST OVERRIDE WITH CONTEXT
 });
 
 function App() {
@@ -40,7 +40,7 @@ function App() {
   const [veJoeShare, setVeJoeShare] = useState(0);
 
   useEffect(() => {
-    getBoostedPool(poolId).then((p) => console.log(`veJOE Share BP%: ${p.veJoeShareBp / 10000}`));
+    getBoostedPool(poolId).then((p) => setVeJoeShare(p.veJoeShareBp / 10000));
   }, [poolId]);
 
   const pool = useMemo(() => {
@@ -61,6 +61,7 @@ function App() {
           </FormGroup>
           <Calculator pool={pool} setPoolId={setPoolId} />
         </div>
+        <div>veJoeShareBp: {(veJoeShare * 100).toFixed(0)}%</div>
       </div>
     </Provider>
   );
