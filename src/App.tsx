@@ -1,11 +1,13 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useReducer, useState } from 'react';
 import { createClient, Provider } from 'urql';
-import Calculator from './Calculator/Calculator';
-import FormGroup from './Calculator/components/FormGroup';
-import PoolPicker from './Calculator/components/PoolPicker';
-import { getBoostedPool } from './data/boosted-contract';
-import { useBoostedPools } from './data/boosted-master-chef';
-import { useAllPairs } from './data/exchange';
+import TokenInputs from './components/TokenInputs';
+import FormGroup from './components/FormGroup';
+import PoolPicker from './components/PoolPicker';
+import { getBoostedPool } from './contracts/boostedMasterChefJoe';
+import { useBoostedPools } from './subgraphs/boostedMasterChef';
+import { useAllPairs } from './subgraphs/exchange';
+import { CalculatorActions, CalculatorReducer, initialCalculatorState } from './state/CalculatorReducer';
+import Results from './components/Results';
 
 const client = createClient({
   url: 'https://api.thegraph.com/subgraphs/name/traderjoe-xyz', //MUST OVERRIDE WITH CONTEXT
@@ -22,46 +24,55 @@ function App() {
     );
   }, [boostedPools.data]);
 
-  const [poolDetails, redoPoolDetails] = useAllPairs(poolIds);
+  const [exchangePools, redoExchangePools] = useAllPairs(poolIds);
 
-  const options = useMemo(() => {
+  const poolOptions = useMemo(() => {
     return (
       boostedPools.data?.pools.map((p) => {
-        const details = poolDetails.data?.pairs.find((pd) => pd.id === p.pair);
+        const details = exchangePools.data?.pairs.find((pd) => pd.id === p.pair);
         return {
           label: details ? `${details.token0.symbol} - ${details.token1.symbol}` : p.pair,
           value: p.id,
         };
       }) ?? []
     );
-  }, [boostedPools.data, poolDetails.data]);
+  }, [boostedPools.data, exchangePools.data]);
 
-  const [poolId, setPoolId] = useState(0);
-  const [veJoeShare, setVeJoeShare] = useState(0);
+  const [formData, dispatch] = useReducer(CalculatorReducer, initialCalculatorState);
 
   useEffect(() => {
-    getBoostedPool(poolId).then((p) => setVeJoeShare(p.veJoeShareBp / 10000));
-  }, [poolId]);
+    const poolName = boostedPools.data?.pools.find((p) => p.id === formData.poolId.toString())?.pair;
+    dispatch({
+      type: CalculatorActions.POPULATE_EXCHANGE_DETAILS,
+      value: exchangePools.data?.pairs.find((pd) => pd.id === poolName),
+    });
+  }, [formData.poolId, boostedPools.data, exchangePools.data, dispatch]);
 
-  const pool = useMemo(() => {
-    const poolName = boostedPools.data?.pools.find((p) => p.id === poolId.toString())?.pair;
-    return poolDetails.data?.pairs.find((pd) => pd.id === poolName);
-  }, [poolId, boostedPools.data, poolDetails.data]);
+  useEffect(() => {
+    getBoostedPool(formData.poolId).then((p) =>
+      dispatch({
+        type: CalculatorActions.POPULATE_BOOST_DETAILS,
+        value: { ...p },
+      })
+    );
+  }, [formData.poolId]);
 
   return (
     <Provider value={client}>
-      <div className='container max-w-screen-md mx-auto my-6 md:px-4 px-2'>
-        <div className='text-center'>
-          <h1 className='text-2xl font-bold text-neutral-600'>veJOE Boost Calculator</h1>
+      <div className='w-screen h-screen bg-slate-50 font-sans'>
+        <div className='container max-w-screen-md mx-auto px-2'>
+          <div className='text-center py-6'>
+            <h1 className='text-2xl font-bold'>veJOE Boost Calculator</h1>
+          </div>
+          <div className='bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4'>
+            <FormGroup label='Boosted Pool' name='pool'>
+              {/* TODO: custom select component with coin logos */}
+              <PoolPicker options={poolOptions} value={formData.poolId} dispatch={dispatch} />
+            </FormGroup>
+            <TokenInputs formData={formData} dispatch={dispatch} />
+            <Results formData={formData} />
+          </div>
         </div>
-        <div className='bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4'>
-          <FormGroup label='Boosted Pool' name='pool'>
-            {/* TODO: custom select component with coin logos */}
-            <PoolPicker options={options} value={poolId} setValue={setPoolId} />
-          </FormGroup>
-          <Calculator pool={pool} setPoolId={setPoolId} />
-        </div>
-        <div>veJoeShareBp: {(veJoeShare * 100).toFixed(0)}%</div>
       </div>
     </Provider>
   );

@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { ChangeEvent, useCallback } from 'react';
+import { CalculatorAction, CalculatorActions } from 'src/state/CalculatorReducer';
 
 interface Pool {
   label: string;
@@ -8,10 +9,17 @@ interface Pool {
 interface Props {
   options: Array<Pool>;
   value: number;
-  setValue: (val: number) => void;
+  dispatch: React.Dispatch<CalculatorAction>;
 }
 
-function PoolPicker({ options, value, setValue }: Props) {
+function PoolPicker({ options, value, dispatch }: Props) {
+  const setPoolId = useCallback(
+    (evt: ChangeEvent<HTMLSelectElement>) => {
+      dispatch({ type: CalculatorActions.SET_POOL_ID, value: Number(evt.target.value) });
+    },
+    [dispatch]
+  );
+
   return (
     <div className='relative'>
       <select
@@ -20,7 +28,7 @@ function PoolPicker({ options, value, setValue }: Props) {
           'focus:outline-none focus:bg-white focus:border-gray-500'
         }
         value={value}
-        onChange={(e) => setValue(Number(e.target.value))}
+        onChange={setPoolId}
       >
         {options &&
           options.map((pool) => (
