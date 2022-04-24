@@ -3,7 +3,7 @@ import { createClient, Provider } from 'urql';
 import TokenInputs from './components/TokenInputs';
 import FormGroup from './components/FormGroup';
 import PoolPicker from './components/PoolPicker';
-import { getBoostedPool } from './contracts/boostedMasterChefJoe';
+import { getBoostedPool, getJoePerSecond } from './contracts/boostedMasterChefJoe';
 import { useBoostedPools } from './subgraphs/boostedMasterChef';
 import { useAllPairs } from './subgraphs/exchange';
 import { CalculatorActions, CalculatorReducer, initialCalculatorState } from './state/CalculatorReducer';
@@ -14,7 +14,25 @@ const client = createClient({
 });
 
 function App() {
+  useEffect(() => {
+    getJoePerSecond().then((p) => {
+      dispatch({
+        type: CalculatorActions.SET_JOE_PER_SECOND,
+        value: p,
+      });
+    });
+  }, []);
+
   const [boostedPools, redoBoostedPools] = useBoostedPools();
+
+  useEffect(() => {
+    if (boostedPools.data?.masterChefs) {
+      dispatch({
+        type: CalculatorActions.SET_TOTAL_ALLOC_POINT,
+        value: boostedPools.data?.masterChefs.reduce((acc, val) => acc + val.totalAllocPoint, 0),
+      });
+    }
+  }, [boostedPools.data?.masterChefs]);
 
   const poolIds = useMemo(() => {
     return (

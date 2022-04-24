@@ -10,9 +10,6 @@ const exchangeQuery = `
     pairs(%FILTER%) {
       id
       name
-      reserve0
-      reserve1
-      reserveUSD
       reserveAVAX
       token0Price
       token1Price
@@ -55,9 +52,6 @@ export interface Token {
 export interface Pair {
   id: string;
   name: string;
-  reserve0: number;
-  reserve1: number;
-  reserveUSD: number;
   reserveAVAX: number;
   token0Price: number;
   token1Price: number;

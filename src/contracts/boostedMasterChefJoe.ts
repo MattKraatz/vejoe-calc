@@ -24,3 +24,7 @@ export interface PoolInfo {
 export function getBoostedPool(id: number): Promise<PoolInfo> {
   return boostedMasterChefJoe.poolInfo(id);
 }
+
+export function getJoePerSecond(): Promise<BigNumber> {
+  return boostedMasterChefJoe.joePerSec();
+}

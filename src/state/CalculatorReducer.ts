@@ -1,3 +1,4 @@
+import { BigNumber } from 'ethers';
 import { PoolInfo } from 'src/contracts/boostedMasterChefJoe';
 import { Pair } from 'src/subgraphs/exchange';
 
@@ -5,9 +6,12 @@ export interface CalculatorState {
   poolId: number;
   exchangeDetails?: Pair;
   boostDetails?: PoolInfo;
+  joePerSecond: BigNumber;
   token0Amount: number;
   token1Amount: number;
   veJoeAmount: number;
+  avaxPrice: number;
+  totalAllocPoint: number;
 }
 
 export interface CalculatorAction {
@@ -19,9 +23,12 @@ export const initialCalculatorState: CalculatorState = {
   poolId: 0,
   exchangeDetails: undefined,
   boostDetails: undefined,
+  joePerSecond: BigNumber.from(0),
   token0Amount: 0,
   token1Amount: 0,
   veJoeAmount: 0,
+  avaxPrice: 0,
+  totalAllocPoint: 21100,
 };
 
 export const CalculatorActions = {
@@ -31,6 +38,9 @@ export const CalculatorActions = {
   SET_VEJOE: 'SET_VEJOE',
   POPULATE_BOOST_DETAILS: 'POPULATE_BOOST_DETAILS',
   POPULATE_EXCHANGE_DETAILS: 'POPULATE_EXCHANGE_DETAILS',
+  SET_JOE_PER_SECOND: 'SET_JOE_PER_SECOND',
+  SET_AVAX_PRICE: 'SET_AVAX_PRICE',
+  SET_TOTAL_ALLOC_POINT: 'SET_TOTAL_ALLOC_POINT',
   RESET: 'RESET',
 };
 
@@ -67,6 +77,21 @@ export function CalculatorReducer(state: CalculatorState, action: CalculatorActi
       return {
         ...state,
         exchangeDetails: action.value,
+      };
+    case CalculatorActions.SET_JOE_PER_SECOND:
+      return {
+        ...state,
+        joePerSecond: action.value,
+      };
+    case CalculatorActions.SET_AVAX_PRICE:
+      return {
+        ...state,
+        avaxPrice: action.value,
+      };
+    case CalculatorActions.SET_TOTAL_ALLOC_POINT:
+      return {
+        ...state,
+        totalAllocPoint: action.value,
       };
     case CalculatorActions.RESET:
       return {

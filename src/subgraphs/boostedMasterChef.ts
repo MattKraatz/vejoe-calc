@@ -7,8 +7,12 @@ const poolsContext = {
 const poolsQuery = `
   query {
     pools {
-        id
-        pair
+      id
+      pair
+      allocPoint
+    }
+    masterChefs {
+      totalAllocPoint
     }
   }
 `;
@@ -22,9 +26,15 @@ export function useBoostedPools() {
 
 interface PoolsResponse {
   pools: Array<Pools>;
+  masterChefs: Array<MasterChef>;
 }
 
 export interface Pools {
   id: string;
   pair: string;
+  allocPoint: number;
+}
+
+export interface MasterChef {
+  totalAllocPoint: number;
 }
