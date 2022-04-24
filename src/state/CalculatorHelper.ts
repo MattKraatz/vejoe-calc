@@ -1,21 +1,19 @@
 import { BigNumber } from 'ethers';
-import { parseEther } from 'ethers/lib/utils';
+import { formatEther, parseEther } from 'ethers/lib/utils';
 
 const VEJOE_SHARE_FACTOR = 10_000;
 const SECONDS_PER_ANNUM = 31_536_000;
 
-export function getJoePerAnnum(joePerSec: BigNumber, allocPoint: number, totalAllocPoint: number): number {
-  return totalAllocPoint
-    ? joePerSec.mul(allocPoint).mul(SECONDS_PER_ANNUM).div(totalAllocPoint).div(parseEther('1.0')).toNumber()
-    : 0;
+export function getJoePerAnnum(joePerSec: BigNumber, allocPoint: number, totalAllocPoint: number): BigNumber {
+  return totalAllocPoint ? joePerSec.mul(allocPoint).mul(SECONDS_PER_ANNUM).div(totalAllocPoint) : BigNumber.from(0);
 }
 
 export function getAnnualRewards(
   userLiquidity: number,
   userVeJoe: number,
-  joePerAnnum: number,
+  joePerAnnum: BigNumber,
   veJoeShare: number,
-  poolLiquidity: number,
+  poolLiquidity: BigNumber,
   poolFactor: BigNumber
 ): [number, number] {
   return [
@@ -24,24 +22,48 @@ export function getAnnualRewards(
   ];
 }
 
-export function getBaseRewards(userLiquidity: number, joePerAnnum: number, veJoeShare: number, poolLiquidity: number) {
-  return (userLiquidity * joePerAnnum * ((VEJOE_SHARE_FACTOR - veJoeShare) / VEJOE_SHARE_FACTOR)) / poolLiquidity;
+export function getBaseRewards(
+  userLiquidity: number,
+  joePerAnnum: BigNumber,
+  veJoeShare: number,
+  poolLiquidity: BigNumber
+) {
+  if (!veJoeShare || poolLiquidity.eq(0)) return 0;
+  return Number(
+    formatEther(
+      parseEther(userLiquidity.toFixed(18))
+        .mul(joePerAnnum)
+        .mul(VEJOE_SHARE_FACTOR - veJoeShare)
+        .div(VEJOE_SHARE_FACTOR)
+        .div(poolLiquidity)
+    )
+  );
 }
 
 export function getBoostedRewards(
   userLiquidity: number,
   userVeJoe: number,
-  joePerAnnum: number,
+  joePerAnnum: BigNumber,
   veJoeShare: number,
   poolFactor: BigNumber
 ) {
   if (BigNumber.from(poolFactor).eq(0)) return 0;
-  const farmFactor = (userLiquidity * userVeJoe) ** 0.5;
-  console.log('farmFactor: ', parseEther(farmFactor.toString()).toString());
-  const joeFactor = joePerAnnum * (veJoeShare / VEJOE_SHARE_FACTOR);
-  console.log('joeFactor: ', joeFactor);
-  console.log('poolFactor:', poolFactor.toString());
-  const userFactor = parseEther(farmFactor.toString()).mul(joeFactor).div(poolFactor);
-  console.log(userFactor.toString());
-  return userFactor.toNumber();
+  const farmFactor = sqrt(parseEther(userLiquidity.toFixed(18)).mul(parseEther(userVeJoe.toFixed(18))));
+  const joeFactor = parseEther(joePerAnnum.toString()).mul(veJoeShare).div(VEJOE_SHARE_FACTOR).toString();
+  const userFactor = farmFactor.mul(joeFactor).div(poolFactor);
+  return Number(formatEther(userFactor));
+}
+
+const ONE = BigNumber.from(1);
+const TWO = BigNumber.from(2);
+
+// from https://github.com/ethers-io/ethers.js/issues/1182#issuecomment-744142921
+function sqrt(value: BigNumber) {
+  let z = value.add(ONE).div(TWO);
+  let y = value;
+  while (z.sub(y).isNegative()) {
+    y = z;
+    z = value.div(z).add(z).div(TWO);
+  }
+  return y;
 }

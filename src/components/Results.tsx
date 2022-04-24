@@ -32,7 +32,7 @@ function Results({ formData }: Props) {
       formData.veJoeAmount,
       joePerAnnum,
       formData.boostDetails?.veJoeShareBp ?? 0,
-      poolLiquidity,
+      parseEther(poolLiquidity.toString()),
       formData.boostDetails?.totalFactor ?? parseEther('0')
     );
   }, [userLiquidity, formData.veJoeAmount, joePerAnnum, formData.boostDetails, poolLiquidity]);
