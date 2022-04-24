@@ -55,13 +55,13 @@ export function CalculatorReducer(state: CalculatorState, action: CalculatorActi
       return {
         ...state,
         token0Amount: action.value,
-        token1Amount: action.value * (state.exchangeDetails?.token1Price ?? 0),
+        token1Amount: action.value * Number(state.exchangeDetails?.token1Price ?? 0),
       };
     case CalculatorActions.SET_TOKEN_1:
       return {
         ...state,
         token1Amount: action.value,
-        token0Amount: action.value * (state.exchangeDetails?.token0Price ?? 0),
+        token0Amount: action.value * Number(state.exchangeDetails?.token0Price ?? 0),
       };
     case CalculatorActions.SET_VEJOE:
       return {

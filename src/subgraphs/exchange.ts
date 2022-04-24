@@ -10,6 +10,7 @@ const exchangeQuery = `
     pairs(%FILTER%) {
       id
       name
+      totalSupply
       reserveAVAX
       token0Price
       token1Price
@@ -23,6 +24,8 @@ const exchangeQuery = `
         symbol
         derivedAVAX
       }
+      reserve0
+      reserve1
     }
   }
 `;
@@ -46,22 +49,25 @@ export function useSinglePair(id: string) {
 export interface Token {
   id: string;
   symbol: string;
-  derivedAVAX: number;
+  derivedAVAX: string;
 }
 
 export interface Pair {
   id: string;
   name: string;
-  reserveAVAX: number;
-  token0Price: number;
-  token1Price: number;
+  totalSupply: string;
+  reserveAVAX: string;
+  token0Price: string;
+  token1Price: string;
   token0: Token;
   token1: Token;
+  reserve0: string;
+  reserve1: string;
 }
 
 interface ExchangeResponse {
   bundles: {
-    avaxPrice: number;
+    avaxPrice: string;
   };
   pairs: Array<Pair>;
 }

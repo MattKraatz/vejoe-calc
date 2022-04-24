@@ -48,9 +48,13 @@
     ]
   },
   "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^5.20.0",
+    "@typescript-eslint/parser": "^5.20.0",
     "assert": "^2.0.0",
     "autoprefixer": "^10.4.4",
     "crypto-browserify": "^3.12.0",
+    "eslint": "^8.14.0",
+    "eslint-plugin-react": "^7.29.4",
     "https-browserify": "^1.0.0",
     "os-browserify": "^0.3.0",
     "postcss": "^8.4.12",
