@@ -22,7 +22,7 @@ export function getJoePerAnnum(joePerSec: BigNumber, allocPoint: number, totalAl
  * @param veJoeShare percentage with 4 decimal places
  * @param poolLiquidity total pool liquidity (including user's liquidity) in wei
  * @param userVeJoe user's veJOE in wei
- * @param poolFactor total pool factor (including user veJOE) in wei
+ * @param poolFactor total pool factor (not including userVeJoe) in wei
  * @returns
  */
 export function getRewards(
@@ -67,7 +67,7 @@ export function getBaseRewards(
  * @param userVeJoe wei
  * @param joeToDistribute total JOE to distribute to this pool in wei
  * @param veJoeShare percentage with 4 decimal places
- * @param poolFactor total pool factor (including user veJOE) in wei
+ * @param poolFactor total pool factor (not including userVeJoe) in wei
  * @returns boosted JOE rewards in wei for annum
  */
 export function getBoostedRewards(
@@ -77,11 +77,10 @@ export function getBoostedRewards(
   veJoeShare: number,
   poolFactor: BigNumber
 ): BigNumber {
-  if (BigNumber.from(poolFactor).eq(0)) return BigNumber.from(0);
   const farmFactor = sqrt(userLiquidity.mul(userVeJoe));
   const joeFactor = joeToDistribute.mul(veJoeShare).div(VEJOE_SHARE_FACTOR);
-  const userFactor = farmFactor.mul(joeFactor).div(poolFactor);
-  return userFactor;
+  if (BigNumber.from(poolFactor).eq(0)) return joeFactor;
+  return farmFactor.mul(joeFactor).div(farmFactor.add(poolFactor));
 }
 
 export function formatWei(wei: BigNumber) {

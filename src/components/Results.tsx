@@ -1,3 +1,4 @@
+import { BigNumber } from 'ethers';
 import { parseEther } from 'ethers/lib/utils';
 import { useMemo } from 'react';
 import { formatWei, getJoePerAnnum, getRewards } from 'src/state/CalculatorHelper';
@@ -14,10 +15,7 @@ function Results({ formData }: Props) {
       Number(formData.exchangeDetails?.reserve0 ?? 1),
     [formData.token0Amount, formData.exchangeDetails]
   );
-  const poolLiquidity = useMemo(
-    () => userLiquidity + Number(formData.exchangeDetails?.totalSupply ?? 0),
-    [userLiquidity, formData.exchangeDetails]
-  );
+
   const joePerAnnum = useMemo(() => {
     return getJoePerAnnum(
       formData.joePerSecond,
@@ -27,18 +25,18 @@ function Results({ formData }: Props) {
   }, [formData.joePerSecond, formData.boostDetails, formData.totalAllocPoint]);
 
   const [baseRewards, boostedRewards] = useMemo(() => {
-    const userFactor = parseEther(formData.veJoeAmount.toFixed(18));
+    const userVeJoe = parseEther(formData.veJoeAmount.toFixed(18));
     const userLiquidityEther = parseEther(userLiquidity.toFixed(18));
 
     return getRewards(
       userLiquidityEther,
       joePerAnnum,
       formData.boostDetails?.veJoeShareBp ?? 0,
-      userLiquidityEther.add(parseEther(poolLiquidity.toString())),
-      userFactor,
-      userFactor.add(formData.boostDetails?.totalFactor ?? parseEther('0'))
+      userLiquidityEther.add(parseEther(formData.exchangeDetails?.totalSupply ?? '0')),
+      userVeJoe,
+      formData.boostDetails?.totalFactor ?? BigNumber.from('0')
     );
-  }, [userLiquidity, formData.veJoeAmount, joePerAnnum, formData.boostDetails, poolLiquidity]);
+  }, [userLiquidity, formData.veJoeAmount, joePerAnnum, formData.boostDetails]);
 
   return (
     <div>
@@ -62,10 +60,6 @@ function Results({ formData }: Props) {
               <td>{userLiquidity}</td>
             </tr>
             <tr>
-              <td>New Pool Liquidity: </td>
-              <td>{poolLiquidity}</td>
-            </tr>
-            <tr>
               <td>Your Base JOE per Year: </td>
               <td>{formatWei(baseRewards)}</td>
             </tr>
@@ -75,9 +69,6 @@ function Results({ formData }: Props) {
             </tr>
           </tbody>
         </table>
-      </div>
-      <div>
-        <pre>{JSON.stringify(formData, null, 2)}</pre>
       </div>
     </div>
   );

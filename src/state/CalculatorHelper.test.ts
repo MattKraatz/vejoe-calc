@@ -13,7 +13,7 @@ test('rewardsPerSecond is accurate per Example 1', () => {
     4000,
     parseEther('11'),
     parseEther('1000'),
-    parseEther('63.25')
+    parseEther('31.62')
   );
   expect(addRewards(alice)).toEqual('2.55');
 
@@ -23,7 +23,7 @@ test('rewardsPerSecond is accurate per Example 1', () => {
     4000,
     parseEther('11'),
     parseEther('100'),
-    parseEther('63.25')
+    parseEther('31.62')
   );
   expect(addRewards(bob)).toEqual('7.45');
 });
@@ -35,7 +35,7 @@ test('rewardsPerSecond is accurate per Example 2', () => {
     4000,
     parseEther('11'),
     parseEther('1000'),
-    parseEther('110')
+    parseEther('10')
   );
   expect(addRewards(alice)).toEqual('9.09');
 
@@ -45,7 +45,7 @@ test('rewardsPerSecond is accurate per Example 2', () => {
     4000,
     parseEther('11'),
     parseEther('100'),
-    parseEther('110')
+    parseEther('100')
   );
   expect(addRewards(bob)).toEqual('0.91');
 });
@@ -61,13 +61,6 @@ test('rewardsPerSecond is accurate per Example 3', () => {
   );
   expect(addRewards(alice)).toEqual('5.45');
 
-  const bob = getRewards(
-    parseEther('1'),
-    parseEther('10'),
-    4000,
-    parseEther('11'),
-    parseEther('100'),
-    parseEther('10')
-  );
+  const bob = getRewards(parseEther('1'), parseEther('10'), 4000, parseEther('11'), parseEther('100'), parseEther('0'));
   expect(addRewards(bob)).toEqual('4.55');
 });
