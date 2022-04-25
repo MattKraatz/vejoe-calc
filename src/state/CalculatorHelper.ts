@@ -1,57 +1,91 @@
 import { BigNumber } from 'ethers';
-import { formatEther, parseEther } from 'ethers/lib/utils';
+import { formatEther } from 'ethers/lib/utils';
 
 const VEJOE_SHARE_FACTOR = 10_000;
 const SECONDS_PER_ANNUM = 31_536_000;
 
+/**
+ * Calculates JOE rewards allocated to this pool over a year
+ * @param joePerSec wei
+ * @param allocPoint JOE reward allocation for this pool
+ * @param totalAllocPoint total allocation points for all pools
+ * @returns JOE rewards in wei allocated to this pool
+ */
 export function getJoePerAnnum(joePerSec: BigNumber, allocPoint: number, totalAllocPoint: number): BigNumber {
   return totalAllocPoint ? joePerSec.mul(allocPoint).mul(SECONDS_PER_ANNUM).div(totalAllocPoint) : BigNumber.from(0);
 }
 
-export function getAnnualRewards(
-  userLiquidity: number,
-  userVeJoe: number,
-  joePerAnnum: BigNumber,
+/**
+ *
+ * @param userLiquidity user's liquidity share in wei
+ * @param joeToDistribute total JOE to distribute to this pool in wei
+ * @param veJoeShare percentage with 4 decimal places
+ * @param poolLiquidity total pool liquidity (including user's liquidity) in wei
+ * @param userVeJoe user's veJOE in wei
+ * @param poolFactor total pool factor (including user veJOE) in wei
+ * @returns
+ */
+export function getRewards(
+  userLiquidity: BigNumber,
+  joeToDistribute: BigNumber,
   veJoeShare: number,
   poolLiquidity: BigNumber,
+  userVeJoe: BigNumber,
   poolFactor: BigNumber
-): [number, number] {
+) {
   return [
-    getBaseRewards(userLiquidity, joePerAnnum, veJoeShare, poolLiquidity),
-    getBoostedRewards(userLiquidity, userVeJoe, joePerAnnum, veJoeShare, poolFactor),
+    getBaseRewards(userLiquidity, joeToDistribute, veJoeShare, poolLiquidity),
+    getBoostedRewards(userLiquidity, userVeJoe, joeToDistribute, veJoeShare, poolFactor),
   ];
 }
 
+/**
+ * Calculates base JOE rewards for a user
+ * @param userLiquidity user's liquidity share in wei
+ * @param joeToDistribute total JOE to distribute to this pool in wei
+ * @param veJoeShare percentage with 4 decimal places
+ * @param poolLiquidity total pool liquidity (including user's liquidity) in wei
+ * @returns base JOE rewards in wei for annum
+ */
 export function getBaseRewards(
-  userLiquidity: number,
-  joePerAnnum: BigNumber,
+  userLiquidity: BigNumber,
+  joeToDistribute: BigNumber,
   veJoeShare: number,
   poolLiquidity: BigNumber
-) {
-  if (!veJoeShare || poolLiquidity.eq(0)) return 0;
-  return Number(
-    formatEther(
-      parseEther(userLiquidity.toFixed(18))
-        .mul(joePerAnnum)
-        .mul(VEJOE_SHARE_FACTOR - veJoeShare)
-        .div(VEJOE_SHARE_FACTOR)
-        .div(poolLiquidity)
-    )
-  );
+): BigNumber {
+  if (!veJoeShare || poolLiquidity.eq(0)) return BigNumber.from(0);
+  return userLiquidity
+    .mul(joeToDistribute)
+    .mul(VEJOE_SHARE_FACTOR - veJoeShare)
+    .div(VEJOE_SHARE_FACTOR)
+    .div(poolLiquidity);
 }
 
+/**
+ * Calculates boosted JOE rewards (via veJOE) for a user
+ * @param userLiquidity user's liquidity share in wei
+ * @param userVeJoe wei
+ * @param joeToDistribute total JOE to distribute to this pool in wei
+ * @param veJoeShare percentage with 4 decimal places
+ * @param poolFactor total pool factor (including user veJOE) in wei
+ * @returns boosted JOE rewards in wei for annum
+ */
 export function getBoostedRewards(
-  userLiquidity: number,
-  userVeJoe: number,
-  joePerAnnum: BigNumber,
+  userLiquidity: BigNumber,
+  userVeJoe: BigNumber,
+  joeToDistribute: BigNumber,
   veJoeShare: number,
   poolFactor: BigNumber
-) {
-  if (BigNumber.from(poolFactor).eq(0)) return 0;
-  const farmFactor = sqrt(parseEther(userLiquidity.toFixed(18)).mul(parseEther(userVeJoe.toFixed(18))));
-  const joeFactor = parseEther(joePerAnnum.toString()).mul(veJoeShare).div(VEJOE_SHARE_FACTOR).toString();
+): BigNumber {
+  if (BigNumber.from(poolFactor).eq(0)) return BigNumber.from(0);
+  const farmFactor = sqrt(userLiquidity.mul(userVeJoe));
+  const joeFactor = joeToDistribute.mul(veJoeShare).div(VEJOE_SHARE_FACTOR);
   const userFactor = farmFactor.mul(joeFactor).div(poolFactor);
-  return Number(formatEther(userFactor));
+  return userFactor;
+}
+
+export function formatWei(wei: BigNumber) {
+  return Number(formatEther(wei)).toLocaleString();
 }
 
 const ONE = BigNumber.from(1);

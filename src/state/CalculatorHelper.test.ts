@@ -1,55 +1,73 @@
 import { BigNumber } from 'ethers';
-import { parseEther } from 'ethers/lib/utils';
-import { getAnnualRewards } from './CalculatorHelper';
+import { formatEther, parseEther } from 'ethers/lib/utils';
+import { getRewards } from './CalculatorHelper';
+
+function addRewards(rewards: Array<BigNumber>) {
+  return Number(formatEther(rewards[0].add(rewards[1]))).toFixed(2);
+}
 
 test('rewardsPerSecond is accurate per Example 1', () => {
-  const [aliceBase, aliceBoost] = getAnnualRewards(
-    1,
-    1000,
-    BigNumber.from(10),
+  const alice = getRewards(
+    parseEther('1'),
+    parseEther('10'),
     4000,
-    BigNumber.from(11),
+    parseEther('11'),
+    parseEther('1000'),
     parseEther('63.25')
   );
-  expect((aliceBase + aliceBoost).toFixed(3)).toEqual('2.545');
+  expect(addRewards(alice)).toEqual('2.55');
 
-  const [bobBase, bobBoost] = getAnnualRewards(
-    10,
-    100,
-    BigNumber.from(10),
+  const bob = getRewards(
+    parseEther('10'),
+    parseEther('10'),
     4000,
-    BigNumber.from(11),
+    parseEther('11'),
+    parseEther('100'),
     parseEther('63.25')
   );
-  expect((bobBase + bobBoost).toFixed(3)).toEqual('7.454');
+  expect(addRewards(bob)).toEqual('7.45');
 });
 
 test('rewardsPerSecond is accurate per Example 2', () => {
-  const [aliceBase, aliceBoost] = getAnnualRewards(
-    10,
-    1000,
-    BigNumber.from(10),
+  const alice = getRewards(
+    parseEther('10'),
+    parseEther('10'),
     4000,
-    BigNumber.from(11),
+    parseEther('11'),
+    parseEther('1000'),
     parseEther('110')
   );
-  expect((aliceBase + aliceBoost).toFixed(3)).toEqual('9.094');
+  expect(addRewards(alice)).toEqual('9.09');
 
-  const [bobBase, bobBoost] = getAnnualRewards(1, 100, BigNumber.from(10), 4000, BigNumber.from(11), parseEther('110'));
-  expect((bobBase + bobBoost).toFixed(3)).toEqual('0.909');
+  const bob = getRewards(
+    parseEther('1'),
+    parseEther('10'),
+    4000,
+    parseEther('11'),
+    parseEther('100'),
+    parseEther('110')
+  );
+  expect(addRewards(bob)).toEqual('0.91');
 });
 
 test('rewardsPerSecond is accurate per Example 3', () => {
-  const [aliceBase, aliceBoost] = getAnnualRewards(
-    10,
-    0,
-    BigNumber.from(10),
+  const alice = getRewards(
+    parseEther('10'),
+    parseEther('10'),
     4000,
-    BigNumber.from(11),
+    parseEther('11'),
+    parseEther('0'),
     parseEther('10')
   );
-  expect((aliceBase + aliceBoost).toFixed(3)).toEqual('5.454');
+  expect(addRewards(alice)).toEqual('5.45');
 
-  const [bobBase, bobBoost] = getAnnualRewards(1, 100, BigNumber.from(10), 4000, BigNumber.from(11), parseEther('10'));
-  expect((bobBase + bobBoost).toFixed(3)).toEqual('4.545');
+  const bob = getRewards(
+    parseEther('1'),
+    parseEther('10'),
+    4000,
+    parseEther('11'),
+    parseEther('100'),
+    parseEther('10')
+  );
+  expect(addRewards(bob)).toEqual('4.55');
 });

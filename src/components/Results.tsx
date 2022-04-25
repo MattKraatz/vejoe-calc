@@ -1,6 +1,6 @@
 import { parseEther } from 'ethers/lib/utils';
 import { useMemo } from 'react';
-import { getAnnualRewards, getJoePerAnnum } from 'src/state/CalculatorHelper';
+import { formatWei, getJoePerAnnum, getRewards } from 'src/state/CalculatorHelper';
 import { CalculatorState } from 'src/state/CalculatorReducer';
 
 interface Props {
@@ -27,13 +27,16 @@ function Results({ formData }: Props) {
   }, [formData.joePerSecond, formData.boostDetails, formData.totalAllocPoint]);
 
   const [baseRewards, boostedRewards] = useMemo(() => {
-    return getAnnualRewards(
-      userLiquidity,
-      formData.veJoeAmount,
+    const userFactor = parseEther(formData.veJoeAmount.toFixed(18));
+    const userLiquidityEther = parseEther(userLiquidity.toFixed(18));
+
+    return getRewards(
+      userLiquidityEther,
       joePerAnnum,
       formData.boostDetails?.veJoeShareBp ?? 0,
-      parseEther(poolLiquidity.toString()),
-      formData.boostDetails?.totalFactor ?? parseEther('0')
+      userLiquidityEther.add(parseEther(poolLiquidity.toString())),
+      userFactor,
+      userFactor.add(formData.boostDetails?.totalFactor ?? parseEther('0'))
     );
   }, [userLiquidity, formData.veJoeAmount, joePerAnnum, formData.boostDetails, poolLiquidity]);
 
@@ -48,7 +51,7 @@ function Results({ formData }: Props) {
             </tr>
             <tr>
               <td>Pool JOE per Year: </td>
-              <td>{joePerAnnum.toLocaleString()}</td>
+              <td>{formatWei(joePerAnnum)}</td>
             </tr>
             <tr>
               <td>Pool Liquidity: </td>
@@ -64,11 +67,11 @@ function Results({ formData }: Props) {
             </tr>
             <tr>
               <td>Your Base JOE per Year: </td>
-              <td>{baseRewards.toLocaleString()}</td>
+              <td>{formatWei(baseRewards)}</td>
             </tr>
             <tr>
               <td>Your Boosted JOE per Year: </td>
-              <td>{boostedRewards.toLocaleString()}</td>
+              <td>{formatWei(boostedRewards)}</td>
             </tr>
           </tbody>
         </table>
