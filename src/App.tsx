@@ -5,7 +5,7 @@ import FormGroup from './components/FormGroup';
 import PoolPicker from './components/PoolPicker';
 import { getBoostedPool, getJoePerSecond } from './contracts/boostedMasterChefJoe';
 import { useBoostedPools } from './subgraphs/boostedMasterChef';
-import { useAllPairs } from './subgraphs/exchange';
+import { useAllPairs, usePriceOfJoe } from './subgraphs/exchange';
 import { CalculatorActions, CalculatorReducer, initialCalculatorState } from './state/CalculatorReducer';
 import Results from './components/Results';
 
@@ -14,6 +14,8 @@ const client = createClient({
 });
 
 function App() {
+  const [formData, dispatch] = useReducer(CalculatorReducer, initialCalculatorState);
+
   useEffect(() => {
     getJoePerSecond().then((p) => {
       dispatch({
@@ -22,6 +24,16 @@ function App() {
       });
     });
   }, []);
+
+  const [joeAvax, redoJoeAvax] = usePriceOfJoe();
+  useEffect(() => {
+    if (joeAvax.data?.bundle) {
+      dispatch({
+        type: CalculatorActions.SET_PRICES,
+        value: [Number(joeAvax.data.bundle.avaxPrice), Number(joeAvax.data.pair.token1Price)],
+      });
+    }
+  }, [joeAvax.data]);
 
   const [boostedPools, redoBoostedPools] = useBoostedPools();
 
@@ -55,8 +67,6 @@ function App() {
       }) ?? []
     );
   }, [boostedPools.data, exchangePools.data]);
-
-  const [formData, dispatch] = useReducer(CalculatorReducer, initialCalculatorState);
 
   useEffect(() => {
     const poolName = boostedPools.data?.pools.find((p) => p.id === formData.poolId.toString())?.pair;

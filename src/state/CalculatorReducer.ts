@@ -11,6 +11,7 @@ export interface CalculatorState {
   token1Amount: number;
   veJoeAmount: number;
   avaxPrice: number;
+  joeDerivedAvax: number;
   totalAllocPoint: number;
 }
 
@@ -28,6 +29,7 @@ export const initialCalculatorState: CalculatorState = {
   token1Amount: 0,
   veJoeAmount: 0,
   avaxPrice: 0,
+  joeDerivedAvax: 0,
   totalAllocPoint: 21100,
 };
 
@@ -39,7 +41,7 @@ export const CalculatorActions = {
   POPULATE_BOOST_DETAILS: 'POPULATE_BOOST_DETAILS',
   POPULATE_EXCHANGE_DETAILS: 'POPULATE_EXCHANGE_DETAILS',
   SET_JOE_PER_SECOND: 'SET_JOE_PER_SECOND',
-  SET_AVAX_PRICE: 'SET_AVAX_PRICE',
+  SET_PRICES: 'SET_PRICES',
   SET_TOTAL_ALLOC_POINT: 'SET_TOTAL_ALLOC_POINT',
   RESET: 'RESET',
 };
@@ -83,10 +85,11 @@ export function CalculatorReducer(state: CalculatorState, action: CalculatorActi
         ...state,
         joePerSecond: action.value,
       };
-    case CalculatorActions.SET_AVAX_PRICE:
+    case CalculatorActions.SET_PRICES:
       return {
         ...state,
-        avaxPrice: action.value,
+        avaxPrice: action.value[0],
+        joeDerivedAvax: action.value[1],
       };
     case CalculatorActions.SET_TOTAL_ALLOC_POINT:
       return {

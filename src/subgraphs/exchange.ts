@@ -2,9 +2,9 @@ import { useQuery } from 'urql';
 
 const exchangeContext = { url: 'https://api.thegraph.com/subgraphs/name/traderjoe-xyz/exchange' };
 
-const exchangeQuery = `
+const allPairsQuery = `
   query {
-    bundles {
+    bundle(id: "1") {
       avaxPrice
     }
     pairs(%FILTER%) {
@@ -32,17 +32,31 @@ const exchangeQuery = `
 
 export function useAllPairs(ids: Array<string>) {
   return useQuery<ExchangeResponse>({
-    query: exchangeQuery.replace('%FILTER%', `where:{id_in:["${ids.join(`","`)}"]}`),
+    query: allPairsQuery.replace('%FILTER%', `where:{id_in:["${ids.join(`","`)}"]}`),
     context: exchangeContext,
     pause: !ids.length,
   });
 }
 
-export function useSinglePair(id: string) {
-  return useQuery<ExchangeResponse>({
-    query: exchangeQuery.replace('%FILTER%', `id:${id}`),
+const joeQuery = `
+  query {
+    bundle(id: "1") {
+      avaxPrice
+    }
+    pair(id:"0x454e67025631c065d3cfad6d71e6892f74487a15") {
+      token1Price
+    }
+  }
+`;
+
+/**
+ * Gets the current price of JOE according to the JOE/WAVAX pair on Trader Joe
+ * @returns JOE
+ */
+export function usePriceOfJoe() {
+  return useQuery<JoeResponse>({
+    query: joeQuery,
     context: exchangeContext,
-    pause: !id,
   });
 }
 
@@ -66,8 +80,15 @@ export interface Pair {
 }
 
 interface ExchangeResponse {
-  bundles: {
+  bundle: {
     avaxPrice: string;
   };
   pairs: Array<Pair>;
+}
+
+interface JoeResponse {
+  bundle: {
+    avaxPrice: string;
+  };
+  pair: Pair;
 }
