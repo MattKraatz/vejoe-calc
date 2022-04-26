@@ -11,12 +11,33 @@ const SECONDS_PER_ANNUM = 31_536_000;
  * @param totalAllocPoint total allocation points for all pools
  * @returns JOE rewards in wei allocated to this pool
  */
-export function getJoePerAnnum(joePerSec: BigNumber, allocPoint: number, totalAllocPoint: number): BigNumber {
+export function calculateJoePerAnnum(joePerSec: BigNumber, allocPoint: number, totalAllocPoint: number): BigNumber {
   return totalAllocPoint ? joePerSec.mul(allocPoint).mul(SECONDS_PER_ANNUM).div(totalAllocPoint) : BigNumber.from(0);
 }
 
 /**
- *
+ * Calculates the user's share of the liquidity pool
+ * @param userToken0 User Liquidity position for one side of the pair
+ * @param token0Reserve Total reserve in the pool for token0 (not including user liquidity)
+ * @param lpTotalSupply Total supply of liquidity pair
+ * @returns User's share of the pool (in LP ether)
+ */
+export function calculateUserLpToken(userToken0: number, token0Reserve: number, lpTotalSupply: number) {
+  return token0Reserve ? (userToken0 * lpTotalSupply) / (token0Reserve + userToken0) : 0;
+}
+
+/**
+ * Calculates the value (in USD) for the user's liquidity position
+ * @param userToken0 User Liquidity position for one side of the pair
+ * @param token0Avax Price (in AVAX) for token0
+ * @param avaxPrice Price (in USD) for AVAX
+ */
+export function calculateUserLpValue(userToken0: number, token0Avax: number, avaxPrice: number) {
+  return 2 * userToken0 * token0Avax * avaxPrice;
+}
+
+/**
+ * Calculates base and boosted (veJOE) JOE rewards for a user
  * @param userLiquidity user's liquidity share in wei
  * @param joeToDistribute total JOE to distribute to this pool in wei
  * @param veJoeShare percentage with 4 decimal places
@@ -25,7 +46,7 @@ export function getJoePerAnnum(joePerSec: BigNumber, allocPoint: number, totalAl
  * @param poolFactor total pool factor (not including userVeJoe) in wei
  * @returns
  */
-export function getRewards(
+export function calculateRewards(
   userLiquidity: BigNumber,
   joeToDistribute: BigNumber,
   veJoeShare: number,
@@ -34,8 +55,8 @@ export function getRewards(
   poolFactor: BigNumber
 ) {
   return [
-    getBaseRewards(userLiquidity, joeToDistribute, veJoeShare, poolLiquidity),
-    getBoostedRewards(userLiquidity, userVeJoe, joeToDistribute, veJoeShare, poolFactor),
+    calculateBaseRewards(userLiquidity, joeToDistribute, veJoeShare, poolLiquidity),
+    calculateBoostedRewards(userLiquidity, userVeJoe, joeToDistribute, veJoeShare, poolFactor),
   ];
 }
 
@@ -47,7 +68,7 @@ export function getRewards(
  * @param poolLiquidity total pool liquidity (including user's liquidity) in wei
  * @returns base JOE rewards in wei for annum
  */
-export function getBaseRewards(
+export function calculateBaseRewards(
   userLiquidity: BigNumber,
   joeToDistribute: BigNumber,
   veJoeShare: number,
@@ -70,7 +91,7 @@ export function getBaseRewards(
  * @param poolFactor total pool factor (not including userVeJoe) in wei
  * @returns boosted JOE rewards in wei for annum
  */
-export function getBoostedRewards(
+export function calculateBoostedRewards(
   userLiquidity: BigNumber,
   userVeJoe: BigNumber,
   joeToDistribute: BigNumber,
@@ -81,10 +102,6 @@ export function getBoostedRewards(
   const joeFactor = joeToDistribute.mul(veJoeShare).div(VEJOE_SHARE_FACTOR);
   if (BigNumber.from(poolFactor).eq(0)) return joeFactor;
   return farmFactor.mul(joeFactor).div(farmFactor.add(poolFactor));
-}
-
-export function formatWei(wei: BigNumber) {
-  return Number(formatEther(wei)).toLocaleString();
 }
 
 const ONE = BigNumber.from(1);

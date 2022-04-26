@@ -1,13 +1,13 @@
 import { BigNumber } from 'ethers';
 import { formatEther, parseEther } from 'ethers/lib/utils';
-import { getRewards } from './CalculatorHelper';
+import { calculateRewards } from './CalculatorHelper';
 
 function addRewards(rewards: Array<BigNumber>) {
   return Number(formatEther(rewards[0].add(rewards[1]))).toFixed(2);
 }
 
 test('rewardsPerSecond is accurate per Example 1', () => {
-  const alice = getRewards(
+  const alice = calculateRewards(
     parseEther('1'),
     parseEther('10'),
     4000,
@@ -17,7 +17,7 @@ test('rewardsPerSecond is accurate per Example 1', () => {
   );
   expect(addRewards(alice)).toEqual('2.55');
 
-  const bob = getRewards(
+  const bob = calculateRewards(
     parseEther('10'),
     parseEther('10'),
     4000,
@@ -29,7 +29,7 @@ test('rewardsPerSecond is accurate per Example 1', () => {
 });
 
 test('rewardsPerSecond is accurate per Example 2', () => {
-  const alice = getRewards(
+  const alice = calculateRewards(
     parseEther('10'),
     parseEther('10'),
     4000,
@@ -39,7 +39,7 @@ test('rewardsPerSecond is accurate per Example 2', () => {
   );
   expect(addRewards(alice)).toEqual('9.09');
 
-  const bob = getRewards(
+  const bob = calculateRewards(
     parseEther('1'),
     parseEther('10'),
     4000,
@@ -51,7 +51,7 @@ test('rewardsPerSecond is accurate per Example 2', () => {
 });
 
 test('rewardsPerSecond is accurate per Example 3', () => {
-  const alice = getRewards(
+  const alice = calculateRewards(
     parseEther('10'),
     parseEther('10'),
     4000,
@@ -61,6 +61,13 @@ test('rewardsPerSecond is accurate per Example 3', () => {
   );
   expect(addRewards(alice)).toEqual('5.45');
 
-  const bob = getRewards(parseEther('1'), parseEther('10'), 4000, parseEther('11'), parseEther('100'), parseEther('0'));
+  const bob = calculateRewards(
+    parseEther('1'),
+    parseEther('10'),
+    4000,
+    parseEther('11'),
+    parseEther('100'),
+    parseEther('0')
+  );
   expect(addRewards(bob)).toEqual('4.55');
 });

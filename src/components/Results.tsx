@@ -1,9 +1,14 @@
 import { BigNumber } from 'ethers';
-import { parseEther } from 'ethers/lib/utils';
-import { useEffect, useMemo, useState } from 'react';
-import { formatWei, getJoePerAnnum, getRewards } from 'src/state/CalculatorHelper';
+import { formatEther, parseEther } from 'ethers/lib/utils';
+import { useMemo } from 'react';
+import {
+  calculateJoePerAnnum,
+  calculateRewards,
+  calculateUserLpToken,
+  calculateUserLpValue,
+} from 'src/helpers/CalculatorHelper';
+import { formatCurrency, formatWei, formatWeiToCurrency } from 'src/helpers/FormatHelper';
 import { CalculatorState } from 'src/state/CalculatorReducer';
-import { usePriceOfJoe } from 'src/subgraphs/exchange';
 
 interface Props {
   formData: CalculatorState;
@@ -12,13 +17,16 @@ interface Props {
 function Results({ formData }: Props) {
   const userLiquidity = useMemo(
     () =>
-      (formData.token0Amount * Number(formData.exchangeDetails?.totalSupply ?? 0)) /
-      Number(formData.exchangeDetails?.reserve0 ?? 1),
+      calculateUserLpToken(
+        formData.token0Amount,
+        Number(formData.exchangeDetails?.reserve0 ?? 0),
+        Number(formData.exchangeDetails?.totalSupply ?? 0)
+      ),
     [formData.token0Amount, formData.exchangeDetails]
   );
 
   const joePerAnnum = useMemo(() => {
-    return getJoePerAnnum(
+    return calculateJoePerAnnum(
       formData.joePerSecond,
       formData.boostDetails?.allocPoint.toNumber() ?? 0,
       formData.totalAllocPoint
@@ -29,7 +37,7 @@ function Results({ formData }: Props) {
     const userVeJoe = parseEther(formData.veJoeAmount.toFixed(18));
     const userLiquidityEther = parseEther(userLiquidity.toFixed(18));
 
-    return getRewards(
+    return calculateRewards(
       userLiquidityEther,
       joePerAnnum,
       formData.boostDetails?.veJoeShareBp ?? 0,
@@ -37,11 +45,13 @@ function Results({ formData }: Props) {
       userVeJoe,
       formData.boostDetails?.totalFactor ?? BigNumber.from('0')
     );
-  }, [userLiquidity, formData.veJoeAmount, joePerAnnum, formData.boostDetails]);
+  }, [userLiquidity, formData.veJoeAmount, joePerAnnum, formData.boostDetails, formData.exchangeDetails]);
 
   const userLiquidityValue = useMemo(() => {
-    return (
-      2 * formData.token0Amount * Number(formData.exchangeDetails?.token0.derivedAVAX ?? 0) * Number(formData.avaxPrice)
+    return calculateUserLpValue(
+      formData.token0Amount,
+      Number(formData.exchangeDetails?.token0.derivedAVAX ?? 0),
+      Number(formData.avaxPrice)
     );
   }, [formData.token0Amount, formData.exchangeDetails, formData.avaxPrice]);
 
@@ -52,72 +62,64 @@ function Results({ formData }: Props) {
 
   return (
     <div>
-      <div>
-        <table>
-          <tbody>
-            <tr>
-              <td>Description</td>
-              <td>Value</td>
-              <td>USD</td>
-            </tr>
-            <tr>
-              <td>Pool veJOE Share: </td>
-              <td>{(formData.boostDetails?.veJoeShareBp ?? 0) / 100}%</td>
-              <td></td>
-            </tr>
-            <tr>
-              <td>Pool JOE per Year: </td>
-              <td>{formatWei(joePerAnnum)}</td>
-              <td>
-                {formatWei(joePerAnnum.mul(priceOfJoe ? Number(priceOfJoe.toFixed(4)) * 10_000 : '0').div(10_000))}
-              </td>
-            </tr>
-            <tr>
-              <td>Pool Liquidity: </td>
-              <td>{formData.exchangeDetails?.totalSupply}</td>
-              <td></td>
-            </tr>
-            <tr>
-              <td>User Liquidity: </td>
-              <td>{userLiquidity}</td>
-            </tr>
-            <tr>
-              <td>User Liquidity Value: </td>
-              <td>
-                {userLiquidityValue.toLocaleString(undefined, {
-                  style: 'currency',
-                  currency: 'USD',
-                })}
-              </td>
-              <td></td>
-            </tr>
-            <tr>
-              <td>Your Base JOE per Year: </td>
-              <td>{formatWei(baseRewards)}</td>
-              <td>
-                {formatWei(baseRewards.mul(priceOfJoe ? Number(priceOfJoe.toFixed(4)) * 10_000 : '0').div(10_000))}
-              </td>
-            </tr>
-            <tr>
-              <td>Your Boosted JOE per Year: </td>
-              <td>{formatWei(boostedRewards)}</td>
-              <td>
-                {formatWei(boostedRewards.mul(priceOfJoe ? Number(priceOfJoe.toFixed(4)) * 10_000 : '0').div(10_000))}
-              </td>
-            </tr>
-            <tr>
-              <td>Price of Joe: </td>
-              <td>
-                {(formData.joeDerivedAvax * formData.avaxPrice).toLocaleString(undefined, {
-                  style: 'currency',
-                  currency: 'USD',
-                })}
-              </td>
-              <td></td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+      <table>
+        <tbody>
+          <tr>
+            <td>Description</td>
+            <td>Amount</td>
+            <td>Value (USD)</td>
+          </tr>
+          <tr>
+            <td>Pool veJOE Share: </td>
+            <td>{(formData.boostDetails?.veJoeShareBp ?? 0) / 100}%</td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>Pool JOE per Year: </td>
+            <td>{formatWei(joePerAnnum)}</td>
+            <td>
+              {formatWeiToCurrency(
+                joePerAnnum.mul(priceOfJoe ? Number(priceOfJoe.toFixed(4)) * 10_000 : '0').div(10_000)
+              )}
+            </td>
+          </tr>
+          <tr>
+            <td>Pool Liquidity: </td>
+            <td>{Number(formData.exchangeDetails?.totalSupply).toFixed(10)}</td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>User Liquidity: </td>
+            <td>{userLiquidity.toFixed(10)}</td>
+            <td>{formatCurrency(userLiquidityValue)}</td>
+          </tr>
+          <tr>
+            <td>Your Base JOE per Year: </td>
+            <td>{formatWei(baseRewards)}</td>
+            <td>{formatCurrency(Number(formatEther(baseRewards)) * priceOfJoe)}</td>
+          </tr>
+          <tr>
+            <td>Your Base APR: </td>
+            <td>{(((Number(formatEther(baseRewards)) * priceOfJoe) / userLiquidityValue) * 100).toFixed(2)}%</td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>Your Boosted JOE per Year: </td>
+            <td>{formatWei(boostedRewards)}</td>
+            <td>{formatCurrency(Number(formatEther(boostedRewards)) * priceOfJoe)}</td>
+          </tr>
+          <tr>
+            <td>Your Boosted APR: </td>
+            <td>{(((Number(formatEther(boostedRewards)) * priceOfJoe) / userLiquidityValue) * 100).toFixed(2)}%</td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>Price of Joe: </td>
+            <td>{formatCurrency(formData.joeDerivedAvax * formData.avaxPrice)}</td>
+            <td></td>
+          </tr>
+        </tbody>
+      </table>
     </div>
   );
 }
