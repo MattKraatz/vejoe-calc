@@ -93,6 +93,7 @@ function App() {
             <h1 className='text-2xl font-bold'>veJOE Boost Calculator</h1>
           </div>
           <div className='bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4'>
+            {/* TODO: handle loading state */}
             <FormGroup label='Boosted Pool' name='pool'>
               {/* TODO: custom select component with coin logos */}
               <PoolPicker options={poolOptions} value={formData.poolId} dispatch={dispatch} />
