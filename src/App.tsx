@@ -127,7 +127,9 @@ function App() {
             <FormGroup label='Set veJOE'>
               <NumberInput value={calcState.veJoeAmount} setValue={setVeJoeAmount} />
             </FormGroup>
-            <Results calcState={calcState} />
+            <FormGroup label='Results'>
+              <Results calcState={calcState} />
+            </FormGroup>
           </div>
         </div>
       </div>
