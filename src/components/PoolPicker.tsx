@@ -23,7 +23,7 @@ function PoolPicker({ options, value, dispatch, isLoading }: Props) {
   );
 
   return (
-    <div className='relative'>
+    <div className='grow relative'>
       <select
         className={
           'block appearance-none w-full bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight' +

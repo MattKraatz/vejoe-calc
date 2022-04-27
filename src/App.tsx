@@ -109,28 +109,24 @@ function App() {
               />
             </FormGroup>
             <FormGroup label='Add Liquidity'>
-              <div className='flex'>
-                <div className='w-1/2 pr-4 flex items-stretch'>
-                  <img
-                    className='flex-none w-auto object-scale-down self-center h-8'
-                    src={getLogo(calcState.exchangeDetails?.token0.id)}
-                  />
-                  <NumberInput value={calcState.token0Amount} setValue={setToken0} />
-                </div>
-                <div className='w-1/2 pr-4 flex items-stretch'>
-                  <img
-                    className='flex-none w-auto object-scale-down self-center h-8'
-                    src={getLogo(calcState.exchangeDetails?.token1.id)}
-                  />
-                  <NumberInput value={calcState.token1Amount} setValue={setToken1} />
-                </div>
+              <div className='w-1/2 pr-4 flex items-stretch'>
+                <img
+                  className='flex-none w-auto object-scale-down self-center h-8'
+                  src={getLogo(calcState.exchangeDetails?.token0.id)}
+                />
+                <NumberInput value={calcState.token0Amount} setValue={setToken0} />
+              </div>
+              <div className='w-1/2 pr-4 flex items-stretch'>
+                <img
+                  className='flex-none w-auto object-scale-down self-center h-8'
+                  src={getLogo(calcState.exchangeDetails?.token1.id)}
+                />
+                <NumberInput value={calcState.token1Amount} setValue={setToken1} />
               </div>
             </FormGroup>
-            <div>
-              <FormGroup label='veJOE'>
-                <NumberInput value={calcState.veJoeAmount} setValue={setVeJoeAmount} />
-              </FormGroup>
-            </div>
+            <FormGroup label='Set veJOE'>
+              <NumberInput value={calcState.veJoeAmount} setValue={setVeJoeAmount} />
+            </FormGroup>
             <Results calcState={calcState} />
           </div>
         </div>
