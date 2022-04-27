@@ -9,6 +9,7 @@ import { CalculatorActions, CalculatorReducer, initialCalculatorState } from './
 import Results from './components/Results';
 import Spinner from './components/Spinner';
 import NumberInput from './components/NumberInput';
+import { getLogo } from './helpers/FormatHelper';
 
 const client = createClient({
   url: 'https://api.thegraph.com/subgraphs/name/traderjoe-xyz', //MUST OVERRIDE WITH CONTEXT
@@ -109,10 +110,18 @@ function App() {
             </FormGroup>
             <FormGroup label='Add Liquidity'>
               <div className='flex'>
-                <div className='w-1/2 pr-4'>
+                <div className='w-1/2 pr-4 flex items-stretch'>
+                  <img
+                    className='flex-none w-auto object-scale-down self-center h-8'
+                    src={getLogo(calcState.exchangeDetails?.token0.id)}
+                  />
                   <NumberInput value={calcState.token0Amount} setValue={setToken0} />
                 </div>
-                <div className='w-1/2 pr-4'>
+                <div className='w-1/2 pr-4 flex items-stretch'>
+                  <img
+                    className='flex-none w-auto object-scale-down self-center h-8'
+                    src={getLogo(calcState.exchangeDetails?.token1.id)}
+                  />
                   <NumberInput value={calcState.token1Amount} setValue={setToken1} />
                 </div>
               </div>

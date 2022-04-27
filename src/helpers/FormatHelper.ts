@@ -1,4 +1,4 @@
-import { BigNumber } from 'ethers';
+import { BigNumber, Contract } from 'ethers';
 import { formatEther } from 'ethers/lib/utils';
 
 export function formatCurrency(value: number) {
@@ -14,6 +14,14 @@ export function formatWei(wei: BigNumber) {
 
 export function formatWeiToCurrency(wei: BigNumber) {
   return formatCurrency(Number(formatEther(wei)));
+}
+
+export function getLogo(ContractId: string | undefined) {
+  if (!ContractId || !supportedLogos.includes(ContractId)) {
+    return '../logos/placeholder.png';
+  } else {
+    return `../logos/${ContractId}.png`;
+  }
 }
 
 const supportedLogos = [

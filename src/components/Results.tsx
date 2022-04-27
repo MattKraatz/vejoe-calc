@@ -79,7 +79,7 @@ function Results({ calcState: formData }: Props) {
             <td>{formatWei(joePerAnnum)}</td>
             <td>
               {formatWeiToCurrency(
-                joePerAnnum.mul(priceOfJoe ? Number(priceOfJoe.toFixed(4)) * 10_000 : '0').div(10_000)
+                joePerAnnum.mul(priceOfJoe ? Number(priceOfJoe.toFixed(4).replace('.', '')) : '0').div(10_000)
               )}
             </td>
           </tr>
