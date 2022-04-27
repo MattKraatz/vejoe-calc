@@ -11,10 +11,10 @@ import { formatCurrency, formatWei, formatWeiToCurrency } from 'src/helpers/Form
 import { CalculatorState } from 'src/state/CalculatorReducer';
 
 interface Props {
-  formData: CalculatorState;
+  calcState: CalculatorState;
 }
 
-function Results({ formData }: Props) {
+function Results({ calcState: formData }: Props) {
   const userLiquidity = useMemo(
     () =>
       calculateUserLpToken(

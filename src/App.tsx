@@ -1,6 +1,5 @@
-import { useEffect, useMemo, useReducer } from 'react';
+import { useCallback, useEffect, useMemo, useReducer } from 'react';
 import { createClient, Provider } from 'urql';
-import TokenInputs from './components/TokenInputs';
 import FormGroup from './components/FormGroup';
 import PoolPicker from './components/PoolPicker';
 import { getBoostedPool, getJoePerSecond } from './contracts/boostedMasterChefJoe';
@@ -8,13 +7,15 @@ import { useBoostedPools } from './subgraphs/boostedMasterChef';
 import { useAllPairs, usePriceOfJoe } from './subgraphs/exchange';
 import { CalculatorActions, CalculatorReducer, initialCalculatorState } from './state/CalculatorReducer';
 import Results from './components/Results';
+import Spinner from './components/Spinner';
+import NumberInput from './components/NumberInput';
 
 const client = createClient({
   url: 'https://api.thegraph.com/subgraphs/name/traderjoe-xyz', //MUST OVERRIDE WITH CONTEXT
 });
 
 function App() {
-  const [formData, dispatch] = useReducer(CalculatorReducer, initialCalculatorState);
+  const [calcState, dispatch] = useReducer(CalculatorReducer, initialCalculatorState);
 
   useEffect(() => {
     getJoePerSecond().then((p) => {
@@ -69,21 +70,25 @@ function App() {
   }, [boostedPools.data, exchangePools.data]);
 
   useEffect(() => {
-    const poolName = boostedPools.data?.pools.find((p) => p.id === formData.poolId.toString())?.pair;
+    const poolName = boostedPools.data?.pools.find((p) => p.id === calcState.poolId.toString())?.pair;
     dispatch({
       type: CalculatorActions.POPULATE_EXCHANGE_DETAILS,
       value: exchangePools.data?.pairs.find((pd) => pd.id === poolName),
     });
-  }, [formData.poolId, boostedPools.data, exchangePools.data, dispatch]);
+  }, [calcState.poolId, boostedPools.data, exchangePools.data, dispatch]);
 
   useEffect(() => {
-    getBoostedPool(formData.poolId).then((p) =>
+    getBoostedPool(calcState.poolId).then((p) =>
       dispatch({
         type: CalculatorActions.POPULATE_BOOST_DETAILS,
         value: { ...p },
       })
     );
-  }, [formData.poolId]);
+  }, [calcState.poolId]);
+
+  const setToken0 = useCallback((val: number) => dispatch({ type: 'SET_TOKEN_0', value: val }), [dispatch]);
+  const setToken1 = useCallback((val: number) => dispatch({ type: 'SET_TOKEN_1', value: val }), [dispatch]);
+  const setVeJoeAmount = useCallback((val: number) => dispatch({ type: 'SET_VEJOE', value: val }), [dispatch]);
 
   return (
     <Provider value={client}>
@@ -93,13 +98,31 @@ function App() {
             <h1 className='text-2xl font-bold'>veJOE Boost Calculator</h1>
           </div>
           <div className='bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4'>
-            {/* TODO: handle loading state */}
-            <FormGroup label='Boosted Pool' name='pool'>
+            <FormGroup label='Select a Boosted Pool'>
               {/* TODO: custom select component with coin logos */}
-              <PoolPicker options={poolOptions} value={formData.poolId} dispatch={dispatch} />
+              <PoolPicker
+                options={poolOptions}
+                value={calcState.poolId}
+                dispatch={dispatch}
+                isLoading={boostedPools.fetching || exchangePools.fetching}
+              />
             </FormGroup>
-            <TokenInputs formData={formData} dispatch={dispatch} />
-            <Results formData={formData} />
+            <FormGroup label='Add Liquidity'>
+              <div className='flex'>
+                <div className='w-1/2 pr-4'>
+                  <NumberInput value={calcState.token0Amount} setValue={setToken0} />
+                </div>
+                <div className='w-1/2 pr-4'>
+                  <NumberInput value={calcState.token1Amount} setValue={setToken1} />
+                </div>
+              </div>
+            </FormGroup>
+            <div>
+              <FormGroup label='veJOE'>
+                <NumberInput value={calcState.veJoeAmount} setValue={setVeJoeAmount} />
+              </FormGroup>
+            </div>
+            <Results calcState={calcState} />
           </div>
         </div>
       </div>
