@@ -7,8 +7,8 @@ export interface CalculatorState {
   exchangeDetails?: Pair;
   boostDetails?: PoolInfo;
   joePerSecond: BigNumber;
-  token0Amount: number;
-  token1Amount: number;
+  token0Amount: string;
+  token1Amount: string;
   veJoeAmount: number;
   avaxPrice: number;
   joeDerivedAvax: number;
@@ -25,8 +25,8 @@ export const initialCalculatorState: CalculatorState = {
   exchangeDetails: undefined,
   boostDetails: undefined,
   joePerSecond: BigNumber.from(0),
-  token0Amount: 0,
-  token1Amount: 0,
+  token0Amount: '',
+  token1Amount: '',
   veJoeAmount: 0,
   avaxPrice: 0,
   joeDerivedAvax: 0,
@@ -57,13 +57,19 @@ export function CalculatorReducer(state: CalculatorState, action: CalculatorActi
       return {
         ...state,
         token0Amount: action.value,
-        token1Amount: action.value * Number(state.exchangeDetails?.token1Price ?? 0),
+        token1Amount:
+          action.value !== ''
+            ? (Number(action.value) * Number(state.exchangeDetails?.token1Price ?? 0)).toString()
+            : '',
       };
     case CalculatorActions.SET_TOKEN_1:
       return {
         ...state,
         token1Amount: action.value,
-        token0Amount: action.value * Number(state.exchangeDetails?.token0Price ?? 0),
+        token0Amount:
+          action.value !== ''
+            ? (Number(action.value) * Number(state.exchangeDetails?.token0Price ?? 0)).toString()
+            : '',
       };
     case CalculatorActions.SET_VEJOE:
       return {
