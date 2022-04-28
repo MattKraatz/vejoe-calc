@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useReducer } from 'react';
-import FormGroup from './FormGroup';
+import SectionHeader from './SectionHeader';
 import PoolPicker from './PoolPicker';
 import { getBoostedPool, getJoePerSecond } from '../contracts/boostedMasterChefJoe';
 import { useBoostedPools } from '../subgraphs/boostedMasterChef';
@@ -9,7 +9,7 @@ import Results from './Results';
 import NumberInput from './NumberInput';
 import TokenInput from './TokenInput';
 import Card from './Card';
-import { formatCurrency } from 'src/helpers/FormatHelper';
+import { formatCurrency, parseNumber } from 'src/helpers/FormatHelper';
 import { calculateUserLpToken, calculateUserLpValue } from 'src/helpers/CalculatorHelper';
 
 function Calculator() {
@@ -89,10 +89,10 @@ function Calculator() {
   const setVeJoeAmount = useCallback((val: number) => dispatch({ type: 'SET_VEJOE', value: val }), [dispatch]);
 
   const userPoolShare = useMemo(() => {
-    const totalSupply = Number(calcState.exchangeDetails?.totalSupply ?? 0);
+    const totalSupply = parseNumber(calcState.exchangeDetails?.totalSupply);
     const userLp = calculateUserLpToken(
-      Number(calcState.token0Amount),
-      Number(calcState.exchangeDetails?.reserve0 ?? 0),
+      parseNumber(calcState.token0Amount),
+      parseNumber(calcState.exchangeDetails?.reserve0),
       totalSupply
     );
     return userLp / totalSupply;
@@ -100,44 +100,40 @@ function Calculator() {
 
   const userLiquidityValue = useMemo(() => {
     return calculateUserLpValue(
-      Number(calcState.token0Amount),
-      Number(calcState.exchangeDetails?.token0.derivedAVAX ?? 0),
-      Number(calcState.avaxPrice)
+      parseNumber(calcState.token0Amount),
+      parseNumber(calcState.exchangeDetails?.token0.derivedAVAX),
+      calcState.avaxPrice
     );
   }, [calcState.token0Amount, calcState.exchangeDetails, calcState.avaxPrice]);
 
   return (
-    <div className='bg-white shadow-md rounded px-8 pt-2 pb-8'>
-      <FormGroup label='Select a Boosted Pool'>
-        {/* TODO: custom select component with coin logos */}
-        <PoolPicker
-          options={poolOptions}
-          value={calcState.poolId}
-          dispatch={dispatch}
-          isLoading={boostedPools.fetching || exchangePools.fetching}
-        />
-      </FormGroup>
-      <FormGroup label='Add Liquidity'>
-        <TokenInput
-          value={calcState.token0Amount}
-          setValue={setToken0}
-          tokenId={calcState.exchangeDetails?.token0.id}
-          tokenName={calcState.exchangeDetails?.token0.symbol}
-        />
-        <TokenInput
-          value={calcState.token1Amount}
-          setValue={setToken1}
-          tokenId={calcState.exchangeDetails?.token1.id}
-          tokenName={calcState.exchangeDetails?.token1.symbol}
-        />
-        <div className='basis-full flex flex-wrap'>
-          <Card title='Liquidity Value' body={formatCurrency(userLiquidityValue)} />
-          <Card title='Pool Share' body={`${(userPoolShare * 100).toFixed(4)}%`} />
-        </div>
-      </FormGroup>
-      <FormGroup label='Set veJOE'>
-        <NumberInput value={calcState.veJoeAmount} setValue={setVeJoeAmount} />
-      </FormGroup>
+    <div className='flex flex-wrap bg-white shadow-md rounded px-8 pt-2 pb-8'>
+      <SectionHeader label='Select a Boosted Pool' />
+      {/* TODO: custom select component with coin logos */}
+      <PoolPicker
+        options={poolOptions}
+        value={calcState.poolId}
+        dispatch={dispatch}
+        isLoading={boostedPools.fetching || exchangePools.fetching}
+      />
+      <SectionHeader label='Add Liquidity' />
+      <TokenInput
+        value={calcState.token0Amount}
+        setValue={setToken0}
+        tokenId={calcState.exchangeDetails?.token0.id}
+        tokenName={calcState.exchangeDetails?.token0.symbol}
+        leftSide
+      />
+      <TokenInput
+        value={calcState.token1Amount}
+        setValue={setToken1}
+        tokenId={calcState.exchangeDetails?.token1.id}
+        tokenName={calcState.exchangeDetails?.token1.symbol}
+      />
+      <Card title='Liquidity Value' body={formatCurrency(userLiquidityValue)} />
+      <Card title='Pool Share' body={`${(userPoolShare * 100).toFixed(4)}%`} />
+      <SectionHeader label='Set veJOE' />
+      <NumberInput value={calcState.veJoeAmount} setValue={setVeJoeAmount} />
       <Results calcState={calcState} />
     </div>
   );

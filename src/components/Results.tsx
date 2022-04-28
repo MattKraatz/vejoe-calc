@@ -7,7 +7,7 @@ import {
   calculateUserLpToken,
   calculateUserLpValue,
 } from 'src/helpers/CalculatorHelper';
-import { formatCurrency, formatWei, formatWeiToCurrency } from 'src/helpers/FormatHelper';
+import { formatPercentage, parseNumber } from 'src/helpers/FormatHelper';
 import { CalculatorState } from 'src/state/CalculatorReducer';
 import Card from './Card';
 
@@ -19,9 +19,9 @@ function Results({ calcState: formData }: Props) {
   const userLiquidity = useMemo(
     () =>
       calculateUserLpToken(
-        Number(formData.token0Amount),
-        Number(formData.exchangeDetails?.reserve0 ?? 0),
-        Number(formData.exchangeDetails?.totalSupply ?? 0)
+        parseNumber(formData.token0Amount),
+        parseNumber(formData.exchangeDetails?.reserve0),
+        parseNumber(formData.exchangeDetails?.totalSupply)
       ),
     [formData.token0Amount, formData.exchangeDetails]
   );
@@ -50,9 +50,9 @@ function Results({ calcState: formData }: Props) {
 
   const userLiquidityValue = useMemo(() => {
     return calculateUserLpValue(
-      Number(formData.token0Amount),
-      Number(formData.exchangeDetails?.token0.derivedAVAX ?? 0),
-      Number(formData.avaxPrice)
+      parseNumber(formData.token0Amount),
+      parseNumber(formData.exchangeDetails?.token0.derivedAVAX),
+      formData.avaxPrice
     );
   }, [formData.token0Amount, formData.exchangeDetails, formData.avaxPrice]);
 
@@ -65,11 +65,11 @@ function Results({ calcState: formData }: Props) {
     <div className='basis-full flex flex-wrap'>
       <Card
         title='Your Base APR'
-        body={`${(((Number(formatEther(baseRewards)) * priceOfJoe) / userLiquidityValue) * 100).toFixed(2)}%`}
+        body={formatPercentage(parseNumber(formatEther(baseRewards)) * priceOfJoe, userLiquidityValue)}
       />
       <Card
         title='Your Boosted APR'
-        body={`${(((Number(formatEther(boostedRewards)) * priceOfJoe) / userLiquidityValue) * 100).toFixed(2)}%`}
+        body={formatPercentage(parseNumber(formatEther(boostedRewards)) * priceOfJoe, userLiquidityValue)}
       />
     </div>
   );

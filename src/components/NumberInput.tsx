@@ -20,7 +20,7 @@ function NumberInput({ value, setValue }: Props) {
   return (
     <input
       className={
-        'shadow appearance-none border rounded flex-auto py-2 px-3 mx-2 text-gray-700 leading-tight' +
+        'shadow appearance-none border rounded flex-auto py-2 px-3 mt-4 mx-2 text-gray-700 leading-tight' +
         'focus:outline-none focus:shadow-outline'
       }
       type='number'

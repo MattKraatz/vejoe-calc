@@ -1,4 +1,4 @@
-import { BigNumber, Contract } from 'ethers';
+import { BigNumber } from 'ethers';
 import { formatEther } from 'ethers/lib/utils';
 
 export function formatCurrency(value: number) {
@@ -14,6 +14,19 @@ export function formatWei(wei: BigNumber) {
 
 export function formatWeiToCurrency(wei: BigNumber) {
   return formatCurrency(Number(formatEther(wei)));
+}
+
+export function formatPercentage(numerator: number, divisor: number) {
+  const percentage = divisor !== 0 ? numerator / divisor : 0;
+  return `${(percentage * 100).toFixed(2)}%`;
+}
+
+export function parseNumber(val: string | undefined) {
+  if (!val || (val.startsWith('.') && val.length === 1)) {
+    return 0;
+  } else {
+    return Number(val);
+  }
 }
 
 export function getLogo(ContractId: string | undefined) {
