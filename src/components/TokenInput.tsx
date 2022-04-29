@@ -1,6 +1,5 @@
 import React, { useCallback } from 'react';
 import { getLogo } from 'src/helpers/FormatHelper';
-import Spinner from './Spinner';
 
 interface Props {
   value: string;
@@ -30,9 +29,7 @@ function TokenInput({ value, setValue, tokenId, tokenName, fullWidth = false, is
 
   return (
     <div className={`mt-4 mx-0 md:mx-4 flex basis-full ${!fullWidth ? 'md:basis-5/12' : ''} items-stretch relative`}>
-      {isLoading ? (
-        <Spinner className={`absolute flex-none w-auto self-center h-8 ml-4`} />
-      ) : (
+      {!isLoading && (
         <img className={`absolute flex-none w-auto object-scale-down self-center h-8 ml-4`} src={getLogo(tokenId)} />
       )}
 
@@ -45,6 +42,7 @@ function TokenInput({ value, setValue, tokenId, tokenName, fullWidth = false, is
         value={value}
         onChange={handleChange}
         placeholder={tokenName}
+        disabled={isLoading}
       />
     </div>
   );

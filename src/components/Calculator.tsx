@@ -107,7 +107,7 @@ function Calculator() {
   }, [calcState.token0Amount, calcState.exchangeDetails, calcState.avaxPrice]);
 
   return (
-    <div className='flex flex-wrap bg-white shadow-md rounded px-8 pt-2 pb-8'>
+    <div className='flex flex-wrap bg-white shadow-md rounded px-8 pt-2 pb-12'>
       <div className='flex flex-wrap w-full mb-4'>
         <SectionHeader label='Select a Boosted Pool' />
         {/* TODO: custom select component with coin logos */}
