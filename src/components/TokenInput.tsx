@@ -13,15 +13,15 @@ interface Props {
 function TokenInput({ value, setValue, tokenId, tokenName, fullWidth = false, isLoading = false }: Props) {
   const handleChange: React.ChangeEventHandler<HTMLInputElement> = useCallback(
     (e) => {
-      const val = e.target.value;
+      const val = e.target.value.replace(',', '');
       if (val.startsWith('.')) {
         if (val.length === 1) {
           setValue('.');
         } else {
-          setValue(`.${Number(e.target.value.replace('.', ''))}`);
+          setValue(`.${Number(val.replace('.', ''))}`); // no alpha
         }
-      } else if (Number(e.target.value) >= 0) {
-        setValue(e.target.value);
+      } else if (Number(val) >= 0) {
+        setValue(val);
       }
     },
     [setValue]
@@ -32,13 +32,14 @@ function TokenInput({ value, setValue, tokenId, tokenName, fullWidth = false, is
       {!isLoading && (
         <img className={`absolute flex-none w-auto object-scale-down self-center h-8 ml-4`} src={getLogo(tokenId)} />
       )}
-
       <input
         className={
           `shadow appearance-none border rounded flex-auto py-2 pr-3 mx-2 pl-12 text-gray-700 leading-tight` +
           'focus:outline-none focus:shadow-outline'
         }
         type='search'
+        inputMode='numeric'
+        pattern='[0-9.]*'
         value={value}
         onChange={handleChange}
         placeholder={tokenName}
