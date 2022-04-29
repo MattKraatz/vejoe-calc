@@ -7,11 +7,11 @@ interface Props {
   setValue: (val: string) => void;
   tokenId: string | undefined;
   tokenName: string | undefined;
-  isLoading: boolean;
-  leftSide?: boolean;
+  fullWidth?: boolean;
+  isLoading?: boolean;
 }
 
-function TokenInput({ value, setValue, tokenId, tokenName, isLoading, leftSide = false }: Props) {
+function TokenInput({ value, setValue, tokenId, tokenName, fullWidth = false, isLoading = false }: Props) {
   const handleChange: React.ChangeEventHandler<HTMLInputElement> = useCallback(
     (e) => {
       const val = e.target.value;
@@ -29,7 +29,7 @@ function TokenInput({ value, setValue, tokenId, tokenName, isLoading, leftSide =
   );
 
   return (
-    <div className={`mt-4 mx-0 md:mx-4 flex basis-full md:basis-5/12 items-stretch relative`}>
+    <div className={`mt-4 mx-0 md:mx-4 flex basis-full ${!fullWidth ? 'md:basis-5/12' : ''} items-stretch relative`}>
       {isLoading ? (
         <Spinner className={`absolute flex-none w-auto self-center h-8 ml-4`} />
       ) : (

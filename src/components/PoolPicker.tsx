@@ -26,8 +26,8 @@ function PoolPicker({ options, value, dispatch, isLoading }: Props) {
     <div className='grow relative px-2'>
       <select
         className={
-          'block appearance-none w-full border border-gray-200 text-gray-700 py-3 px-4 pr-8 mt-4 rounded leading-tight' +
-          'focus:outline-none focus:border-gray-500'
+          'block appearance-none w-full border border-zinc-200 text-zinc-700 py-3 px-4 pr-8 mt-4 rounded leading-tight' +
+          'focus:outline-none focus:border-zinc-500'
         }
         value={value}
         onChange={setPoolId}
@@ -41,7 +41,7 @@ function PoolPicker({ options, value, dispatch, isLoading }: Props) {
             </option>
           ))}
       </select>
-      <div className='pointer-events-none absolute inset-y-0 right-4 pt-4 flex items-center text-gray-700'>
+      <div className='pointer-events-none absolute inset-y-0 right-4 pt-4 flex items-center text-zinc-700'>
         {isLoading ? (
           <Spinner />
         ) : (

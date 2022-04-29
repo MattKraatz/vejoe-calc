@@ -9,7 +9,7 @@ export interface CalculatorState {
   joePerSecond: BigNumber;
   token0Amount: string;
   token1Amount: string;
-  veJoeAmount: number;
+  veJoeAmount: string;
   avaxPrice: number;
   joeDerivedAvax: number;
   totalAllocPoint: number;
@@ -27,7 +27,7 @@ export const initialCalculatorState: CalculatorState = {
   joePerSecond: BigNumber.from(0),
   token0Amount: '',
   token1Amount: '',
-  veJoeAmount: 0,
+  veJoeAmount: '',
   avaxPrice: 0,
   joeDerivedAvax: 0,
   totalAllocPoint: 21100,

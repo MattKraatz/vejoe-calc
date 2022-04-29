@@ -100,8 +100,9 @@ export function calculateBoostedRewards(
 ): BigNumber {
   const farmFactor = sqrt(userLiquidity.mul(userVeJoe));
   const joeFactor = joeToDistribute.mul(veJoeShare).div(VEJOE_SHARE_FACTOR);
-  if (BigNumber.from(poolFactor).eq(0)) return joeFactor;
-  return farmFactor.mul(joeFactor).div(farmFactor.add(poolFactor));
+  const divisor = farmFactor.add(poolFactor);
+  if (divisor.eq(0)) return joeFactor;
+  return farmFactor.mul(joeFactor).div(divisor);
 }
 
 const ONE = BigNumber.from(1);

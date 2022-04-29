@@ -35,7 +35,7 @@ function Results({ calcState: formData }: Props) {
   }, [formData.joePerSecond, formData.boostDetails, formData.totalAllocPoint]);
 
   const [baseRewards, boostedRewards] = useMemo(() => {
-    const userVeJoe = parseEther(formData.veJoeAmount.toFixed(18));
+    const userVeJoe = parseEther(formData.veJoeAmount ? formData.veJoeAmount : '0');
     const userLiquidityEther = parseEther(userLiquidity.toFixed(18));
 
     return calculateRewards(
