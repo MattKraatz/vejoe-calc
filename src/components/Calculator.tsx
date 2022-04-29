@@ -117,23 +117,30 @@ function Calculator() {
         isLoading={boostedPools.fetching || exchangePools.fetching}
       />
       <SectionHeader label='Add Liquidity' />
-      <TokenInput
-        value={calcState.token0Amount}
-        setValue={setToken0}
-        tokenId={calcState.exchangeDetails?.token0.id}
-        tokenName={calcState.exchangeDetails?.token0.symbol}
-        leftSide
-      />
-      <TokenInput
-        value={calcState.token1Amount}
-        setValue={setToken1}
-        tokenId={calcState.exchangeDetails?.token1.id}
-        tokenName={calcState.exchangeDetails?.token1.symbol}
-      />
+      <div className='flex flex-wrap w-full mb-2'>
+        <TokenInput
+          value={calcState.token0Amount}
+          setValue={setToken0}
+          tokenId={calcState.exchangeDetails?.token0.id}
+          tokenName={calcState.exchangeDetails?.token0.symbol}
+          isLoading={boostedPools.fetching || exchangePools.fetching}
+          leftSide
+        />
+        <div className='grow text-center text-4xl mt-3'>+</div>
+        <TokenInput
+          value={calcState.token1Amount}
+          setValue={setToken1}
+          tokenId={calcState.exchangeDetails?.token1.id}
+          tokenName={calcState.exchangeDetails?.token1.symbol}
+          isLoading={boostedPools.fetching || exchangePools.fetching}
+        />
+      </div>
       <Card title='Liquidity Value' body={formatCurrency(userLiquidityValue)} />
       <Card title='Pool Share' body={`${(userPoolShare * 100).toFixed(4)}%`} />
       <SectionHeader label='Set veJOE' />
-      <NumberInput value={calcState.veJoeAmount} setValue={setVeJoeAmount} />
+      <div className='mb-4 flex basis-full'>
+        <NumberInput value={calcState.veJoeAmount} setValue={setVeJoeAmount} />
+      </div>
       <Results calcState={calcState} />
     </div>
   );

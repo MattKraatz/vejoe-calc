@@ -1,15 +1,17 @@
-import React, { useCallback, useMemo } from 'react';
+import React, { useCallback } from 'react';
 import { getLogo } from 'src/helpers/FormatHelper';
+import Spinner from './Spinner';
 
 interface Props {
   value: string;
   setValue: (val: string) => void;
   tokenId: string | undefined;
   tokenName: string | undefined;
+  isLoading: boolean;
   leftSide?: boolean;
 }
 
-function TokenInput({ value, setValue, tokenId, tokenName, leftSide = false }: Props) {
+function TokenInput({ value, setValue, tokenId, tokenName, isLoading, leftSide = false }: Props) {
   const handleChange: React.ChangeEventHandler<HTMLInputElement> = useCallback(
     (e) => {
       const val = e.target.value;
@@ -27,27 +29,23 @@ function TokenInput({ value, setValue, tokenId, tokenName, leftSide = false }: P
   );
 
   return (
-    <div className={`w-full md:w-1/2 ${leftSide ? 'mt-4' : 'md:mt-4 mt-8'} flex items-stretch relative`}>
-      <img
-        className={`absolute flex-none w-auto object-scale-down self-center h-8 ${leftSide ? 'ml-4' : 'ml-6'}`}
-        src={getLogo(tokenId)}
-      />
+    <div className={`mt-4 mx-0 md:mx-4 flex basis-full md:basis-5/12 items-stretch relative`}>
+      {isLoading ? (
+        <Spinner className={`absolute flex-none w-auto self-center h-8 ml-4`} />
+      ) : (
+        <img className={`absolute flex-none w-auto object-scale-down self-center h-8 ml-4`} src={getLogo(tokenId)} />
+      )}
+
       <input
         className={
-          `shadow appearance-none border rounded flex-auto py-2 pr-3 mx-2 ${
-            leftSide ? 'pl-12 md:ml-2 md:mr-4' : 'pl-14 md:ml-4 md:mr-2'
-          } text-gray-700 leading-tight` + 'focus:outline-none focus:shadow-outline'
+          `shadow appearance-none border rounded flex-auto py-2 pr-3 mx-2 pl-12 text-gray-700 leading-tight` +
+          'focus:outline-none focus:shadow-outline'
         }
         type='string'
         value={value}
         onChange={handleChange}
         placeholder={tokenName}
       />
-      {leftSide && (
-        <p className='absolute pointer-events-none z-0 w-full text-center md:text-right text-3xl -bottom-8 md:bottom-1 md:-right-2'>
-          +
-        </p>
-      )}
     </div>
   );
 }
