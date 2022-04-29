@@ -84,6 +84,9 @@ export function CalculatorReducer(state: CalculatorState, action: CalculatorActi
     case CalculatorActions.POPULATE_EXCHANGE_DETAILS:
       return {
         ...state,
+        token0Amount: '',
+        token1Amount: '',
+        veJoeAmount: '',
         exchangeDetails: action.value,
       };
     case CalculatorActions.SET_JOE_PER_SECOND:
