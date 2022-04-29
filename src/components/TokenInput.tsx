@@ -38,7 +38,7 @@ function TokenInput({ value, setValue, tokenId, tokenName, fullWidth = false, is
           `shadow appearance-none border rounded flex-auto py-2 pr-3 mx-2 pl-12 text-gray-700 leading-tight` +
           'focus:outline-none focus:shadow-outline'
         }
-        type='string'
+        type='search'
         value={value}
         onChange={handleChange}
         placeholder={tokenName}
