@@ -4,20 +4,18 @@ import PoolPicker from './PoolPicker';
 import { getBoostedPool, getJoePerSecond } from '../contracts/boostedMasterChefJoe';
 import { useBoostedPools } from '../subgraphs/boostedMasterChef';
 import { useAllPairs, usePriceOfJoe } from '../subgraphs/exchange';
-import { CalculatorActions, CalculatorReducer, initialCalculatorState } from '../state/CalculatorReducer';
-import Results from './Results';
+import { CalculatorReducer, initialState } from '../state/CalculatorReducer';
+import AprResults from './AprResults';
 import TokenInput from './TokenInput';
-import Card from './Card';
-import { formatCurrency, parseNumber } from 'src/helpers/FormatHelper';
-import { calculateUserLpToken, calculateUserLpValue } from 'src/helpers/CalculatorHelper';
+import LiquidityResults from './LiquidityResults';
 
 function Calculator() {
-  const [calcState, dispatch] = useReducer(CalculatorReducer, initialCalculatorState);
+  const [calcState, dispatch] = useReducer(CalculatorReducer, initialState);
 
   useEffect(() => {
     getJoePerSecond().then((p) => {
       dispatch({
-        type: CalculatorActions.SET_JOE_PER_SECOND,
+        type: 'SET_JOE_PER_SECOND',
         value: p,
       });
     });
@@ -27,7 +25,7 @@ function Calculator() {
   useEffect(() => {
     if (joeAvax.data?.bundle) {
       dispatch({
-        type: CalculatorActions.SET_PRICES,
+        type: 'SET_PRICES',
         value: [Number(joeAvax.data.bundle.avaxPrice), Number(joeAvax.data.pair.token1Price)],
       });
     }
@@ -38,7 +36,7 @@ function Calculator() {
   useEffect(() => {
     if (boostedPools.data?.masterChefs) {
       dispatch({
-        type: CalculatorActions.SET_TOTAL_ALLOC_POINT,
+        type: 'SET_TOTAL_ALLOC_POINT',
         value: boostedPools.data?.masterChefs.reduce((acc, val) => acc + val.totalAllocPoint, 0),
       });
     }
@@ -59,7 +57,7 @@ function Calculator() {
       boostedPools.data?.pools.map((p) => {
         const details = exchangePools.data?.pairs.find((pd) => pd.id === p.pair);
         return {
-          label: details ? `${details.token0.symbol} - ${details.token1.symbol}` : p.pair,
+          label: details ? `${details.token0.symbol} <-> ${details.token1.symbol}` : p.pair,
           value: p.id,
         };
       }) ?? []
@@ -68,16 +66,18 @@ function Calculator() {
 
   useEffect(() => {
     const poolName = boostedPools.data?.pools.find((p) => p.id === calcState.poolId.toString())?.pair;
-    dispatch({
-      type: CalculatorActions.POPULATE_EXCHANGE_DETAILS,
-      value: exchangePools.data?.pairs.find((pd) => pd.id === poolName),
-    });
+    const exchangeDetails = exchangePools.data?.pairs.find((pd) => pd.id === poolName);
+    if (exchangeDetails)
+      dispatch({
+        type: 'POPULATE_EXCHANGE_DETAILS',
+        value: exchangeDetails,
+      });
   }, [calcState.poolId, boostedPools.data, exchangePools.data, dispatch]);
 
   useEffect(() => {
     getBoostedPool(calcState.poolId).then((p) =>
       dispatch({
-        type: CalculatorActions.POPULATE_BOOST_DETAILS,
+        type: 'POPULATE_BOOST_DETAILS',
         value: { ...p },
       })
     );
@@ -87,30 +87,10 @@ function Calculator() {
   const setToken1 = useCallback((val: string) => dispatch({ type: 'SET_TOKEN_1', value: val }), [dispatch]);
   const setVeJoeAmount = useCallback((val: string) => dispatch({ type: 'SET_VEJOE', value: val }), [dispatch]);
 
-  const userPoolShare = useMemo(() => {
-    const totalSupply = parseNumber(calcState.exchangeDetails?.totalSupply);
-    if (totalSupply === 0) return 0;
-    const userLp = calculateUserLpToken(
-      parseNumber(calcState.token0Amount),
-      parseNumber(calcState.exchangeDetails?.reserve0),
-      totalSupply
-    );
-    return userLp / totalSupply;
-  }, [calcState.token0Amount, calcState.exchangeDetails]);
-
-  const userLiquidityValue = useMemo(() => {
-    return calculateUserLpValue(
-      parseNumber(calcState.token0Amount),
-      parseNumber(calcState.exchangeDetails?.token0.derivedAVAX),
-      calcState.avaxPrice
-    );
-  }, [calcState.token0Amount, calcState.exchangeDetails, calcState.avaxPrice]);
-
   return (
     <div className='flex flex-wrap bg-white shadow-md rounded px-4 md:px-8 pt-2 pb-12'>
       <div className='flex flex-wrap w-full mb-4'>
         <SectionHeader label='Select a Boosted Pool' />
-        {/* TODO: custom select component with coin logos */}
         <PoolPicker
           options={poolOptions}
           value={calcState.poolId}
@@ -137,8 +117,7 @@ function Calculator() {
             isLoading={boostedPools.fetching || exchangePools.fetching}
           />
         </div>
-        <Card title='Liquidity Value' body={formatCurrency(userLiquidityValue)} />
-        <Card title='Pool Share' body={`${(userPoolShare * 100).toFixed(4)}%`} />
+        <LiquidityResults calcState={calcState} />
       </div>
       <SectionHeader label='veJOE and Boosted APR' />
       <div className='mb-4 flex basis-full'>
@@ -150,7 +129,7 @@ function Calculator() {
           fullWidth
         />
       </div>
-      <Results calcState={calcState} />
+      <AprResults calcState={calcState} />
     </div>
   );
 }

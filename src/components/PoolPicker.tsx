@@ -1,5 +1,5 @@
-import React, { ChangeEvent, useCallback } from 'react';
-import { CalculatorAction, CalculatorActions } from 'src/state/CalculatorReducer';
+import { ChangeEvent, useCallback } from 'react';
+import { CalculatorAction } from 'src/state/CalculatorReducer';
 import Spinner from './Spinner';
 
 interface Pool {
@@ -17,7 +17,7 @@ interface Props {
 function PoolPicker({ options, value, dispatch, isLoading }: Props) {
   const setPoolId = useCallback(
     (evt: ChangeEvent<HTMLSelectElement>) => {
-      dispatch({ type: CalculatorActions.SET_POOL_ID, value: Number(evt.target.value) });
+      dispatch({ type: 'SET_POOL_ID', value: Number(evt.target.value) });
     },
     [dispatch]
   );

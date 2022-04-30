@@ -1,5 +1,4 @@
 import { BigNumber } from 'ethers';
-import { formatEther } from 'ethers/lib/utils';
 
 const VEJOE_SHARE_FACTOR = 10_000;
 const SECONDS_PER_ANNUM = 31_536_000;

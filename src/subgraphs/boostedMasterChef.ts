@@ -17,6 +17,10 @@ const poolsQuery = `
   }
 `;
 
+/**
+ * queries the boosted MasterChef subgraph for all boosted pools
+ * @returns basic details for all pools
+ */
 export function useBoostedPools() {
   return useQuery<PoolsResponse>({
     query: poolsQuery,

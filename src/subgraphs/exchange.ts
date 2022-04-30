@@ -30,6 +30,11 @@ const allPairsQuery = `
   }
 `;
 
+/**
+ * Queries the Exchange subgraph for the provided Pair IDs
+ * @param ids  exchange pair contract addresses
+ * @returns pair details
+ */
 export function useAllPairs(ids: Array<string>) {
   return useQuery<ExchangeResponse>({
     query: allPairsQuery.replace('%FILTER%', `where:{id_in:["${ids.join(`","`)}"]}`),

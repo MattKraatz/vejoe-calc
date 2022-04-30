@@ -15,7 +15,7 @@ interface Props {
   calcState: CalculatorState;
 }
 
-function Results({ calcState: formData }: Props) {
+function AprResults({ calcState: formData }: Props) {
   const userLiquidity = useMemo(
     () =>
       calculateUserLpToken(
@@ -75,4 +75,4 @@ function Results({ calcState: formData }: Props) {
   );
 }
 
-export default Results;
+export default AprResults;
