@@ -79,7 +79,6 @@ export function CalculatorReducer(state: CalculatorState, action: CalculatorActi
         ...state,
         token0Amount: '',
         token1Amount: '',
-        veJoeAmount: '',
         exchangeDetails: action.value,
       };
     case 'SET_JOE_PER_SECOND':
