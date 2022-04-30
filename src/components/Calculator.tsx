@@ -88,7 +88,7 @@ function Calculator() {
   const setVeJoeAmount = useCallback((val: string) => dispatch({ type: 'SET_VEJOE', value: val }), [dispatch]);
 
   return (
-    <div className='flex flex-wrap bg-white shadow-md rounded px-4 md:px-8 pt-2 pb-12'>
+    <div className='bg-white shadow-md rounded px-4 md:px-8 pt-2 pb-12'>
       <div className='flex flex-wrap w-full mb-4'>
         <SectionHeader label='Select a Boosted Pool' />
         <PoolPicker
